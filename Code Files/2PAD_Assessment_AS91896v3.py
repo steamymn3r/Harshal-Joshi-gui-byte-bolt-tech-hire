@@ -37,18 +37,18 @@ def new_order():
     checkbox_vars = []
     selected_items = []
     
-
-    root.title("Byte and Bolt Tech Hire - New Order Page")
-    root.geometry("1000x1000")
-    root.configure(bg="#fff6d6")
+    r = tk.Toplevel(root)
+    r.title("Byte and Bolt Tech Hire - New Order Page")
+    r.geometry("1000x1000")
+    r.configure(bg="#fff6d6")
 
     # Name input of applicant
-    tk.Label(root, text="Enter your name:", font=("Garamond", 14, "bold"), fg="#635dff", bg="#eddea7").pack(pady=10)
-    entry1 = tk.Entry(root)
+    tk.Label(r, text="Enter your name:", font=("Garamond", 14, "bold"), fg="#635dff", bg="#eddea7").pack(pady=10)
+    entry1 = tk.Entry(r)
     entry1.pack()
 
     # Item input
-    tk.Label(root, text="-- Items --", font=("Garamond", 14, "bold"), fg="#635dff", bg="#eddea7").pack(pady=10)
+    tk.Label(r, text="-- Items --", font=("Garamond", 14, "bold"), fg="#635dff", bg="#eddea7").pack(pady=10)
     
     # Show items
     for i, item_data in enumerate(item_list):
@@ -59,14 +59,14 @@ def new_order():
 
 
     # Quantity button - How much of each item does the applicant want?
-    tk.Label(root, text="Quantity", font=("Garamond", 14), anchor="e").pack(pady=10)
+    tk.Label(r, text="Quantity", font=("Garamond", 14), anchor="e").pack(pady=10)
 
     # Save button - FIX: Pass window reference 'root' so we can close it upon saving
-    save_order1 = tk.Button(root, text="Save Order", bg="#635dff", command=lambda: save_order(root))
+    save_order1 = tk.Button(r, text="Save Order", bg="#635dff", command=lambda: save_order(r))
     save_order1.pack(pady=5, padx=5)
     
     # Close new order window
-    close1 = tk.Button(root, text="Close Window", bg="#e81313", command=root.destroy)
+    close1 = tk.Button(r, text="Close Window", bg="#e81313", command=r.destroy)
     close1.pack(pady=5)
 
 # Save order. This function will now successfully write to your file
@@ -113,9 +113,10 @@ def show_order():
 
 
 def return_order():
-    root.title("Byte and Bolt Tech Hire - Return Order Page")
-    root.geometry("500x500")
-    root.configure(bg="#d4c893")
+    r = tk.Toplevel(root)
+    r.title("Byte and Bolt Tech Hire - Return Order Page")
+    r.geometry("500x500")
+    r.configure(bg="#d4c893")
     tk.Label(root, text="Return Order Page", font= ("Garamond", 14, "bold"), bg="#AFA273").pack(pady=10)
 
 
