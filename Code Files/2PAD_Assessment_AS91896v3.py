@@ -10,8 +10,30 @@ import datetime
 root = tk.Tk()
 root.title("Byte & Bolt Tech Hire (Home Page)")
 root.geometry("500x500")
-root.configure(bg="#e8e2c8")
 
+content_frame = tk.Frame(root)
+content_frame.pack(fill="both", expand=True)
+
+def clear_frame():
+    """Removes all widgets currently inside the content frame."""
+    for widget in content_frame.winfo_children():
+        widget.destroy()
+
+def main_menu_build():
+    clear_frame()
+    main_menu_frame=tk.Frame(root, bg="#e8e2c8", borderwidth=10, relief="ridge")
+    main_menu_frame.pack(padx=20, pady=20, fill="both", expand=True)
+
+
+def new_order_menu_build():
+    clear_frame()
+    new_order_menu_frame=tk.Frame(root, bg="#e8e2c8", borderwidth=10, relief="ridge")
+    new_order_menu_frame.pack(padx=20, pady=20, fill="both", expand=True)
+
+def return_order_menu_build():
+    clear_frame()
+    return_order_menu_frame=tk.Frame(root, bg="#e8e2c8", borderwidth=10, relief="ridge")
+    return_order_menu_frame.pack(padx=20, pady=20, fill="both", expand=True)
 # FIX: Keep tracks of Tkinter variables separately from text strings
 checkbox_vars = []
 selected_items = []
@@ -54,12 +76,14 @@ def new_order():
     for i, item_data in enumerate(item_list):
         var = tk.IntVar()
         checkbox_vars.append(var)  # Track the IntVars separately
-        chk = tk.Checkbutton(root, text=f"{item_data[0]} (${item_data[1]})", variable=var, compound="left", padx=10, bg="white", command=lambda i=i: process_item_data(i), font=("Arial", 10))
+        chk = tk.Checkbutton(r, text=f"{item_data[0]} (${item_data[1]})", variable=var, compound="left", padx=10, bg="white", command=lambda i=i: process_item_data(i), font=("Arial", 10))
         chk.pack(anchor='w', pady=4)
 
 
     # Quantity button - How much of each item does the applicant want?
     tk.Label(r, text="Quantity", font=("Garamond", 14), anchor="e").pack(pady=10)
+    entry2 = tk.Entry(r)
+    entry2.pack()
 
     # Save button - FIX: Pass window reference 'root' so we can close it upon saving
     save_order1 = tk.Button(r, text="Save Order", bg="#635dff", command=lambda: save_order(r))
@@ -117,13 +141,13 @@ def return_order():
     r.title("Byte and Bolt Tech Hire - Return Order Page")
     r.geometry("500x500")
     r.configure(bg="#d4c893")
-    tk.Label(root, text="Return Order Page", font= ("Garamond", 14, "bold"), bg="#AFA273").pack(pady=10)
+    tk.Label(r, text="Return Order Page", font= ("Garamond", 14, "bold"), bg="#AFA273").pack(pady=10)
 
 
 
 
     # Close return order window
-    close1 = tk.Button(root, text="Close Window", bg="#e81313", command=root.destroy)
+    close1 = tk.Button(r, text="Close Window", bg="#e81313", command=r.destroy)
     close1.pack(pady=5)
 
 
@@ -139,21 +163,21 @@ item_list = [
 # BUTTONS
 
 
-tk.Label(root, text="Welcome to Byte and Bolt Tech Hire!", font=("Garamond", 20, "bold"), bg="#cbc2a3", width = 50).pack(pady=20)
+tk.Label(main_menu_build, text="Welcome to Byte and Bolt Tech Hire!", font=("Garamond", 20, "bold"), bg="#cbc2a3", width = 50,).pack(pady=20)
 # Button to New Order window
-new_order = tk.Button(root, text="New Order", bg="#635dff", command=new_order, width = 25)
+new_order = tk.Button(main_menu_frame, text="New Order", bg="#635dff", command=new_order, width = 25)
 new_order.pack(pady=5, padx=5)
 
 # Button to Show Order Window
-show_order = tk.Button(root, text="Show Order", bg="#635dff", command=show_order, width = 25)
+show_order = tk.Button(main_menu_frame, text="Show Order", bg="#635dff", command=show_order, width = 25)
 show_order.pack(pady=5, padx=5)
 
-# Button to Return Order Window (under construction)
-return_order = tk.Button(root, text="Return Order", bg="#635dff", command=return_order, width = 25)
+# Button to Return Order Window 
+return_order = tk.Button(main_menu_frame, text="Return Order", bg="#635dff", command=return_order, width = 25)
 return_order.pack(pady=5, padx=5)
 
 # Button to kill the application
-close_app = tk.Button(root, text="Close Application", bg="#e81313", command=root.destroy, width = 25)
+close_app = tk.Button(main_menu_frame, text="Close Application", bg="#e81313", command=root.destroy, width = 25)
 close_app.pack(pady=5, padx=5)
 
 root.mainloop()
