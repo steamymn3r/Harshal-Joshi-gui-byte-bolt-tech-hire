@@ -159,7 +159,14 @@ item_list = [
     ["ANe 3 Keyboard", 15], ["ANe 3 Mouse", 10], ["Bright PC", 45], ["CRYPT 438c Laptop", 26], ["33rT Headset", 10],
     ["ARf 4 Keyboard", 22], ["ARf 4 Mouse", 17], ["Torrential PC", 65], ["TAB1TH 553d Laptop", 35], ["25yR Headset", 22]
 ]
+# AHHHHHHHHHHHHHHHHAHASHDHASFJHSLDKJHFLAKSHFLKJSADHFKJHDSFLKHDKLJFHKJSDHFKLSDHFLKSDHFLKJ
 
+
+def main():
+    print("Hi!")
+
+
+main()
 # BUTTONS
 
 
