@@ -19,22 +19,27 @@ def clear_frame():
     for widget in content_frame.winfo_children():
         widget.destroy()
 
-def main_menu_build():
-    clear_frame()
-    main_menu_frame=tk.Frame(root, bg="#e8e2c8", borderwidth=10, relief="ridge")
-    main_menu_frame.pack(padx=20, pady=20, fill="both", expand=True)
+# Changed master from root to content_frame to fix structural flow
+main_menu_frame = tk.Frame(content_frame, bg="#e8e2c8", borderwidth=10, relief="ridge")
+new_order_menu_frame = tk.Frame(content_frame, bg="#e8e2c8", borderwidth=10, relief="ridge")
+return_order_menu_frame = tk.Frame(content_frame, bg="#e8e2c8", borderwidth=10, relief="ridge")
 
+def main_menu_build():
+    main_menu_frame.pack(padx=20, pady=20, fill="both", expand=True)
+    new_order_menu_frame.pack_forget()
+    return_order_menu_frame.pack_forget()
 
 def new_order_menu_build():
-    clear_frame()
-    new_order_menu_frame=tk.Frame(root, bg="#e8e2c8", borderwidth=10, relief="ridge")
+    main_menu_frame.pack_forget()
     new_order_menu_frame.pack(padx=20, pady=20, fill="both", expand=True)
+    return_order_menu_frame.pack_forget()
 
 def return_order_menu_build():
-    clear_frame()
-    return_order_menu_frame=tk.Frame(root, bg="#e8e2c8", borderwidth=10, relief="ridge")
+    main_menu_frame.pack_forget()
+    new_order_menu_frame.pack_forget()
     return_order_menu_frame.pack(padx=20, pady=20, fill="both", expand=True)
-# FIX: Keep tracks of Tkinter variables separately from text strings
+
+# Tracks of Tkinter variables separately from text strings
 checkbox_vars = []
 selected_items = []
 entry1 = None
@@ -51,8 +56,8 @@ def process_item_data(index):
         if item_list[index][0] in selected_items:
             selected_items.remove(item_list[index][0])
 
-# New order. This function will allow the user to place a new order.
-def new_order():
+# New order function
+def new_order_action():
     global entry1, checkbox_vars, selected_items
     
     # Reset tracking arrays for a clean new window session
@@ -79,13 +84,12 @@ def new_order():
         chk = tk.Checkbutton(r, text=f"{item_data[0]} (${item_data[1]})", variable=var, compound="left", padx=10, bg="white", command=lambda i=i: process_item_data(i), font=("Arial", 10))
         chk.pack(anchor='w', pady=4)
 
-
-    # Quantity button - How much of each item does the applicant want?
+    # Quantity button
     tk.Label(r, text="Quantity", font=("Garamond", 14), anchor="e").pack(pady=10)
     entry2 = tk.Entry(r)
     entry2.pack()
 
-    # Save button - FIX: Pass window reference 'root' so we can close it upon saving
+    # Save button
     save_order1 = tk.Button(r, text="Save Order", bg="#635dff", command=lambda: save_order(r))
     save_order1.pack(pady=5, padx=5)
     
@@ -93,7 +97,7 @@ def new_order():
     close1 = tk.Button(r, text="Close Window", bg="#e81313", command=r.destroy)
     close1.pack(pady=5)
 
-# Save order. This function will now successfully write to your file
+# Save order function
 def save_order(window_to_close):
     global entry1, selected_items
     name_a = str(entry1.get()).strip()
@@ -108,9 +112,7 @@ def save_order(window_to_close):
         messagebox.showerror("Error", "Please select at least one item.")
         return
 
-    # --- FIX: WRITE DATA TO THE FILE ---
     try:
-        # 'a' appends new orders to the end of the file instead of wiping old data
         with open(filename, "a") as f:
             timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             items_ordered = ", ".join(selected_items)
@@ -121,7 +123,7 @@ def save_order(window_to_close):
     except Exception as e:
         messagebox.showerror("Error", f"Could not save file: {str(e)}")
 
-def show_order():
+def show_order_action():
     # Check if file doesn't exist or is empty
     if not os.path.exists(filename) or os.path.getsize(filename) == 0:
         messagebox.showerror("No Data", "No files or records found.")
@@ -135,56 +137,42 @@ def show_order():
     else:
         messagebox.showinfo("Data", data)
 
-
-def return_order():
+def return_order_action():
     r = tk.Toplevel(root)
     r.title("Byte and Bolt Tech Hire - Return Order Page")
     r.geometry("500x500")
     r.configure(bg="#d4c893")
-    tk.Label(r, text="Return Order Page", font= ("Garamond", 14, "bold"), bg="#AFA273").pack(pady=10)
-
-
-
+    tk.Label(r, text="Return Order Page", font=("Garamond", 14, "bold"), bg="#AFA273").pack(pady=10)
 
     # Close return order window
     close1 = tk.Button(r, text="Close Window", bg="#e81313", command=r.destroy)
     close1.pack(pady=5)
 
-
-
-filename = "savefile.txt"
 item_list = [
     ["ACC 1 Keyboard", 20], ["ACC 1 Mouse", 15], ["Execute PC", 60], ["ARD4T 672a Laptop", 32], ["33Gi Headset", 17],
     ["ACT 2 Keyboard", 25], ["ACT 2 Mouse", 25], ["Muscle PC", 70], ["TR4G0N 884b Laptop", 38], ["36I8 Headset", 27],
     ["ANe 3 Keyboard", 15], ["ANe 3 Mouse", 10], ["Bright PC", 45], ["CRYPT 438c Laptop", 26], ["33rT Headset", 10],
     ["ARf 4 Keyboard", 22], ["ARf 4 Mouse", 17], ["Torrential PC", 65], ["TAB1TH 553d Laptop", 35], ["25yR Headset", 22]
 ]
-# AHHHHHHHHHHHHHHHHAHASHDHASFJHSLDKJHFLAKSHFLKJSADHFKJHDSFLKHDKLJFHKJSDHFKLSDHFLKSDHFLKJ
 
+# BUTTONS & LABELS
+# FIX: Changed parent from main_menu_build (function) to main_menu_frame (widget)
+tk.Label(main_menu_frame, text="Welcome to Byte and Bolt Tech Hire!", font=("Garamond", 20, "bold"), bg="#cbc2a3").pack(pady=20)
 
-def main():
-    print("Hi!")
+# FIX: Renamed button objects to prevent overwriting function namespaces
+btn_new_order = tk.Button(main_menu_frame, text="New Order", bg="#635dff", command=new_order_action, width=25)
+btn_new_order.pack(pady=5, padx=5)
 
+btn_show_order = tk.Button(main_menu_frame, text="Show Order", bg="#635dff", command=show_order_action, width=25)
+btn_show_order.pack(pady=5, padx=5)
 
-main()
-# BUTTONS
+btn_return_order = tk.Button(main_menu_frame, text="Return Order", bg="#635dff", command=return_order_action, width=25)
+btn_return_order.pack(pady=5, padx=5)
 
-
-tk.Label(main_menu_build, text="Welcome to Byte and Bolt Tech Hire!", font=("Garamond", 20, "bold"), bg="#cbc2a3", width = 50,).pack(pady=20)
-# Button to New Order window
-new_order = tk.Button(main_menu_frame, text="New Order", bg="#635dff", command=new_order, width = 25)
-new_order.pack(pady=5, padx=5)
-
-# Button to Show Order Window
-show_order = tk.Button(main_menu_frame, text="Show Order", bg="#635dff", command=show_order, width = 25)
-show_order.pack(pady=5, padx=5)
-
-# Button to Return Order Window 
-return_order = tk.Button(main_menu_frame, text="Return Order", bg="#635dff", command=return_order, width = 25)
-return_order.pack(pady=5, padx=5)
-
-# Button to kill the application
-close_app = tk.Button(main_menu_frame, text="Close Application", bg="#e81313", command=root.destroy, width = 25)
+close_app = tk.Button(main_menu_frame, text="Close Application", bg="#e81313", command=root.destroy, width=25)
 close_app.pack(pady=5, padx=5)
+
+# FIX: Build the initial main menu view on startup
+main_menu_build()
 
 root.mainloop()
