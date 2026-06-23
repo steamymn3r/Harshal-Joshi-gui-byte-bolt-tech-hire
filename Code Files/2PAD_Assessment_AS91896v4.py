@@ -129,6 +129,8 @@ def show_order_action():
 # --- ERROR HANDLING ---
 def error_handling():
     global entry_quantity, entry_name
+
+    
     
     # if not entry_quantity <= 20:
     #     messagebox.showerror("Quantity Error", "Please enter a valid quantity (less than or equal to 20)!")
