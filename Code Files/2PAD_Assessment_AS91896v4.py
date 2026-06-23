@@ -2,6 +2,7 @@
 # Purpose: To create a GUI application for Byte and Bolt Tech Hire
 # Date: 29 - 5 - 2026 (first edited)
 import tkinter as tk
+from tkinter import ttk
 from tkinter import messagebox
 import os
 import datetime
@@ -35,7 +36,7 @@ def main_menu_build():
     main_menu_frame.pack(padx=20, pady=20, fill="both", expand=True)
 
 def new_order_menu_build():
-    """Switches the window space over to the order construction module."""
+    # Switches the window space over to the order construction module.
     # Reset tracking arrays for a clean user entry state
     global checkbox_vars, selected_items
     checkbox_vars.clear()
@@ -129,11 +130,11 @@ def show_order_action():
 def error_handling():
     global entry_quantity, entry_name
     
-    if not entry_quantity <= 20:
-        messagebox.showerror("Quantity Error", "Please enter a valid quantity (less than or equal to 20)!")
+    # if not entry_quantity <= 20:
+    #     messagebox.showerror("Quantity Error", "Please enter a valid quantity (less than or equal to 20)!")
     
-    if entry_name.strip().isalpha() == False:
-        messagebox.showerror("Invalid Input", "Name contains numbers!")
+    # if entry_name.strip().isalpha() == False:
+    #     messagebox.showerror("Invalid Input", "Name contains numbers!")
 
 # --- INTERFACE LAYOUT BUILDERS ---
 
@@ -159,7 +160,7 @@ entry_name.pack(pady=2)
 
 tk.Label(new_order_menu_frame, text="Quantity Wanted:", bg="#eddea7").pack()
 error_handling()
-entry_quantity = tk.Entry(new_order_menu_frame)
+entry_quantity = ttk.Combobox(new_order_menu_frame,values=[str(i) for i in range(1, 21)])
 entry_quantity.pack(pady=2)
 
 # Dynamic scrollable container block for equipment listings
