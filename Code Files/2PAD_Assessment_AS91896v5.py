@@ -25,7 +25,8 @@ item_list = [
 # Tracking states
 checkbox_vars = []
 selected_items = []
-entry_name = None
+entry_name_new_order = None
+entry_name_return = None
 entry_quantity = None
 
 # --- NAVIGATION FLOW CONTROLLERS ---
@@ -42,8 +43,10 @@ def new_order_menu_build():
     global checkbox_vars, selected_items
     checkbox_vars.clear()
     selected_items.clear()
-    entry_name.delete(0, tk.END)
-    entry_quantity.delete(0, tk.END)
+    if entry_name_new_order is not None:
+        entry_name_new_order.delete(0, tk.END)
+    if entry_quantity is not None:
+        entry_quantity.delete(0, tk.END)
     
     # Rebuild item checklist inside the scrollable container
     for widget in scrollable_frame.winfo_children():
@@ -87,7 +90,11 @@ def process_item_data(index):
 
 def save_order_action():
     """Validates inputs and saves data directly to flat text files."""
-    name_a = str(entry_name.get()).strip()
+    if entry_name_new_order is None:
+        messagebox.showerror("Error", "The new order form is not ready yet.")
+        return
+
+    name_a = str(entry_name_new_order.get()).strip()
     qty = str(entry_quantity.get()).strip()
     receipt_number = str(generate_receipt_number()).strip()
     
@@ -131,28 +138,19 @@ def show_order_action():
 
 def return_order_action():
     # Return process - involves deleting a record from the savefile based on receipt number and/or name - needs to be integrated with search order
-    global entry_name, generated_receipt_number
-    name_a = str(entry_name.get()).strip()
-    receipt_number = str(generate_receipt_number()).strip()
+    name_a = str(entry_name_return.get()).strip()
+    receipt_number = str(entry_receipt.get()).strip()
+
+    if name_a == "" and receipt_number == "":
+        messagebox.showerror("Error", "Please enter a customer name or receipt number.")
+        return
 
     try:
         with open(filename, "w") as f:
             messagebox.showinfo("Success", "Return processed successfully!")
     except Exception as e:
         messagebox.showerror("Error", f"Could not process return: {str(e)}")
-# --- ERROR HANDLING ---
-def error_handling():
-    global entry_quantity, entry_name
 
-    
-    
-    # if not entry_quantity <= 20:
-    #     messagebox.showerror("Quantity Error", "Please enter a valid quantity (less than or equal to 20)!")
-    
-    # if entry_name.strip().isalpha() == False:
-    #     messagebox.showerror("Invalid Input", "Name contains numbers!")
-
-# --- INTERFACE LAYOUT BUILDERS ---
 
 # Frame 1: Home Screen Layout Setup
 main_menu_frame = tk.Frame(root, bg="#e8e2c8", borderwidth=10, relief="ridge")
@@ -170,12 +168,10 @@ tk.Label(new_order_menu_frame, text="Create New Hire Order", font=("Garamond", 1
 
 # Customer metadata forms
 tk.Label(new_order_menu_frame, text="Customer Name:", bg="#eddea7").pack()
-error_handling()
-entry_name = tk.Entry(new_order_menu_frame)
-entry_name.pack(pady=2)
+entry_name_new_order = tk.Entry(new_order_menu_frame)
+entry_name_new_order.pack(pady=2)
 
 tk.Label(new_order_menu_frame, text="Quantity Wanted:", bg="#eddea7").pack()
-error_handling()
 entry_quantity = ttk.Combobox(new_order_menu_frame,values=[str(i) for i in range(1, 21)])
 entry_quantity.pack(pady=2)
 
@@ -210,9 +206,8 @@ return_order_menu_frame = tk.Frame(root, bg="#d4c893", borderwidth=10, relief="r
 tk.Label(return_order_menu_frame, text="Equipment Return Portal", font=("Garamond", 14, "bold"), bg="#AFA273").pack(pady=10)
 
 tk.Label(return_order_menu_frame, text="Customer Name:", bg="#AFA273").pack()
-error_handling()
-entry_name = tk.Entry(return_order_menu_frame)
-entry_name.pack(pady=2)
+entry_name_return = tk.Entry(return_order_menu_frame)
+entry_name_return.pack(pady=2)
 
 tk.Label(return_order_menu_frame, text="Receipt Number", bg= "#AFA273").pack()
 entry_receipt = tk.Entry(return_order_menu_frame)
