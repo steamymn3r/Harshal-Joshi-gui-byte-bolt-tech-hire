@@ -4,6 +4,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+import random
 import os
 import datetime
 
@@ -88,6 +89,7 @@ def save_order_action():
     """Validates inputs and saves data directly to flat text files."""
     name_a = str(entry_name.get()).strip()
     qty = str(entry_quantity.get()).strip()
+    receipt_number = str(generate_receipt_number()).strip()
     
     if name_a == "":
         messagebox.showerror("Error", "Please enter your name.")
@@ -105,7 +107,7 @@ def save_order_action():
         with open(filename, "a") as f:
             timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             items_ordered = ", ".join(selected_items)
-            f.write(f"Date: {timestamp} | Customer: {name_a} | Items: {items_ordered} | Qty: {qty}\n")
+            f.write(f"Date: {timestamp} | Customer: {name_a} | Items: {items_ordered} | Qty: {qty} | Receipt Number: {receipt_number}\n")
         
         messagebox.showinfo("Success", "Order saved successfully!")
         main_menu_build()  # Route user back to home panel on success
@@ -126,6 +128,18 @@ def show_order_action():
     else:
         messagebox.showinfo("Data", data)
 
+
+def return_order_action():
+    # Return process - involves deleting a record from the savefile based on receipt number and/or name - needs to be integrated with search order
+    global entry_name, generated_receipt_number
+    name_a = str(entry_name.get()).strip()
+    receipt_number = str(generate_receipt_number()).strip()
+
+    try:
+        with open(filename, "w") as f:
+            messagebox.showinfo("Success", "Return processed successfully!")
+    except Exception as e:
+        messagebox.showerror("Error", f"Could not process return: {str(e)}")
 # --- ERROR HANDLING ---
 def error_handling():
     global entry_quantity, entry_name
@@ -165,6 +179,12 @@ error_handling()
 entry_quantity = ttk.Combobox(new_order_menu_frame,values=[str(i) for i in range(1, 21)])
 entry_quantity.pack(pady=2)
 
+# Random receipt generator
+def generate_receipt_number():
+    return f"R{random.randint(0000, 9999)}"
+
+tk.Label(new_order_menu_frame, text=f"Receipt Number: {generate_receipt_number()}", bg="#eddea7").pack(pady=5)
+
 # Dynamic scrollable container block for equipment listings
 canvas_container = tk.Frame(new_order_menu_frame, bd=1, relief="sunken")
 canvas_container.pack(fill="both", expand=True, pady=5)
@@ -189,9 +209,21 @@ tk.Button(new_order_menu_frame, text="Cancel & Back", bg="#e81313", fg="white", 
 return_order_menu_frame = tk.Frame(root, bg="#d4c893", borderwidth=10, relief="ridge")
 tk.Label(return_order_menu_frame, text="Equipment Return Portal", font=("Garamond", 14, "bold"), bg="#AFA273").pack(pady=10)
 
+tk.Label(return_order_menu_frame, text="Customer Name:", bg="#AFA273").pack()
+error_handling()
+entry_name = tk.Entry(return_order_menu_frame)
+entry_name.pack(pady=2)
+
+tk.Label(return_order_menu_frame, text="Receipt Number", bg= "#AFA273").pack()
+entry_receipt = tk.Entry(return_order_menu_frame)
+entry_receipt.pack(pady=2)
+
+
 # Functional return components can be expanded directly down here
-tk.Label(return_order_menu_frame, text="(Return processing components go here)", bg="#d4c893").pack(pady=40)
+tk.Button(return_order_menu_frame, text="Show Existing Orders & Search Orders", bg="#635dff", fg="white", command=show_order_action).pack(pady=5)
+tk.Button(return_order_menu_frame, text="Return 1 Order", bg = "#635dff", fg="white", command=return_order_action).pack(pady=5)
 tk.Button(return_order_menu_frame, text="Return to Main Menu", bg="#e81313", fg="white", command=main_menu_build).pack(pady=5)
+
 
 
 # Run layout generator initializer sequence
