@@ -106,10 +106,12 @@ def save_order_action():
         messagebox.showerror("Error", "Please select at least one item.")
         return
         
-    if qty == "" or not qty.isdigit() or int(qty) <= 0:
+    if qty == "" or not qty.isdigit():
         messagebox.showerror("Error", "Please enter a valid numeric quantity.")
         return
-
+    if int(qty) < 1 or int(qty) > 20:
+        messagebox.showerror("Error", "Please enter a quantity between 1 and 20.")
+        return
     try:
         with open(filename, "a") as f:
             timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -137,7 +139,7 @@ def show_order_action():
 
 
 def return_order_action():
-    # Return process - involves deleting a record from the savefile based on receipt number and/or name - needs to be integrated with search order
+    """Finds one matching order by customer name or receipt number and removes that one record."""
     name_a = str(entry_name_return.get()).strip()
     receipt_number = str(entry_receipt.get()).strip()
 
@@ -145,9 +147,39 @@ def return_order_action():
         messagebox.showerror("Error", "Please enter a customer name or receipt number.")
         return
 
+    if not os.path.exists(filename) or os.path.getsize(filename) == 0:
+        messagebox.showerror("Error", "No orders found to return.")
+        return
+
     try:
+        with open(filename, "r") as f:
+            lines = [line.rstrip("\n") for line in f if line.strip()]
+
+        matching_lines = []
+        for line in lines:
+            line_lower = line.lower()
+            if receipt_number and receipt_number.lower() in line_lower:
+                matching_lines.append(line)
+            elif name_a and f"customer: {name_a}".lower() in line_lower:
+                matching_lines.append(line)
+
+        if not matching_lines:
+            messagebox.showerror("Error", "No matching order found.")
+            return
+
+        if len(matching_lines) > 1:
+            messagebox.showwarning("Multiple Matches", "More than one order matched. Please use the receipt number for an exact result.")
+            return
+
+        matched_order = matching_lines[0]
+        messagebox.showinfo("Order Found", f"Returning this order:\n{matched_order}")
+
+        remaining_lines = [line for line in lines if line != matched_order]
         with open(filename, "w") as f:
-            messagebox.showinfo("Success", "Return processed successfully!")
+            if remaining_lines:
+                f.write("\n".join(remaining_lines) + "\n")
+
+        messagebox.showinfo("Success", "One order returned successfully!")
     except Exception as e:
         messagebox.showerror("Error", f"Could not process return: {str(e)}")
 
