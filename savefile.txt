@@ -1,3 +1,0 @@
-Date: 2026-06-19 09:21:24 | Customer: Harshal Joshi | Items: ACC 1 Keyboard, ACC 1 Mouse, Execute PC, ARD4T 672a Laptop, 33Gi Headset, ACT 2 Keyboard
-Date: 2026-06-20 11:38:08 | Customer: harshal | Items: ACT 2 Mouse, Muscle PC, 36I8 Headset, ANe 3 Keyboard | Qty: 54
-Date: 2026-06-20 13:59:48 | Customer: 2 | Items: Execute PC, ARD4T 672a Laptop | Qty: 34
