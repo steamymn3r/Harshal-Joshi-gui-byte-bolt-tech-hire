@@ -3,10 +3,13 @@
 # Date: 29 - 5 - 2026 (first edited)
 import tkinter as tk
 from tkinter import ttk
+from tkinter import *
 from tkinter import messagebox
 import random
 import os
 import datetime
+import random
+import calendar
 
 # Main window setup
 root = tk.Tk()
@@ -26,7 +29,11 @@ item_list = [
 checkbox_vars = []
 selected_items = []
 entry_name = None
-entry_quantity = None
+
+
+# Entry quantity combobox
+
+
 
 # --- NAVIGATION FLOW CONTROLLERS ---
 

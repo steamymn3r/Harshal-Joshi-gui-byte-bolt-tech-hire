@@ -6,8 +6,8 @@ from tkinter import ttk
 from tkinter import messagebox
 import random
 import os
-import datetime
-from PIL import Image, ImageTk
+from datetime import date, datetime, timedelta
+from pathlib import Path
 
 # Main window setup
 root = tk.Tk()
@@ -29,7 +29,7 @@ selected_items = []
 entry_name_new_order = None
 entry_name_return = None
 entry_quantity = None
-
+order_date = None
 # --- NAVIGATION FLOW CONTROLLERS ---
 
 def main_menu_build():
@@ -114,12 +114,15 @@ def save_order_action():
         messagebox.showerror("Error", "Please enter a quantity between 1 and 20.")
         return
     try:
+        order_date = date.today().strftime("%d-%m-%Y")
+        order_time = datetime.now().strftime("%H:%M:%S")
+        follow_up_date = (date.today() + timedelta(days=7)).strftime("%d-%m-%Y")
+        items_ordered = ", ".join(selected_items)
+
         with open(filename, "a") as f:
-            timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            items_ordered = ", ".join(selected_items)
-            f.write(f"Date: {timestamp} | Customer: {name_a} | Items: {items_ordered} | Qty: {qty} | Receipt Number: {receipt_number}\n")
+            f.write(f"Date Ordered: {order_date} {order_time} | Follow-Up By: {follow_up_date} | Customer: {name_a} | Items: {items_ordered} | Qty: {qty} | Receipt Number: {receipt_number}\n")
         
-        messagebox.showinfo("Success", "Order saved successfully!")
+        messagebox.showinfo("Success", f"Order saved successfully!\nFollow-up by: {follow_up_date}")
         main_menu_build()  # Route user back to home panel on success
     except Exception as e:
         messagebox.showerror("Error", f"Could not save file: {str(e)}")
@@ -186,8 +189,8 @@ def return_order_action():
 
 
 # Frame 1: Home Screen Layout Setup
-main_menu_frame = tk.Frame(root, bg="#dbdee2", borderwidth=10, relief="ridge")
-tk.Label(main_menu_frame, text="Welcome to Byte & Bolt!", font=("Times New Roman", 18, "bold"), bg="#929292").pack(pady=20)
+main_menu_frame = tk.Frame(root, bg="#e8e2c8", borderwidth=10, relief="ridge")
+tk.Label(main_menu_frame, text="Welcome to Byte & Bolt!", font=("Garamond", 18, "bold"), bg="#cbc2a3").pack(pady=20)
 
 tk.Button(main_menu_frame, text="New Order Page", bg="#635dff", fg="white", command=new_order_menu_build, width=25).pack(pady=5)
 tk.Button(main_menu_frame, text="Show Existing Orders", bg="#635dff", fg="white", command=show_order_action, width=25).pack(pady=5)
@@ -195,6 +198,23 @@ tk.Button(main_menu_frame, text="Return Order Page", bg="#635dff", fg="white", c
 tk.Button(main_menu_frame, text="Exit Application", bg="#e81313", fg="white", command=root.destroy, width=25).pack(pady=20)
 
 
+file_path = Path(__file__).resolve().parent.parent / "Images" / "Logo.png"
+if file_path.exists():
+    try:
+        png_image = tk.PhotoImage(file=str(file_path))
+        try:
+            image_to_use = png_image.subsample(9, 9)
+        except Exception:
+            image_to_use = png_image
+        image_frame = tk.Frame(main_menu_frame)
+        image_label = tk.Label(image_frame, image=image_to_use)
+        image_frame.place(x=350, y=10)
+        image_frame.configure(bg="#edf5ff")
+        image_label.pack()
+    except Exception as e:
+        print(f"Warning: could not load image: {e}")
+else:
+    print(f"Warning: image not found at {file_path}")
 # Frame 2: New Order Screen Layout Setup
 new_order_menu_frame = tk.Frame(root, bg="#fff6d6", borderwidth=10, relief="ridge")
 tk.Label(new_order_menu_frame, text="Create New Hire Order", font=("Garamond", 14, "bold"), bg="#eddea7").pack(pady=5)
@@ -207,6 +227,11 @@ entry_name_new_order.pack(pady=2)
 tk.Label(new_order_menu_frame, text="Quantity Wanted:", bg="#eddea7").pack()
 entry_quantity = ttk.Combobox(new_order_menu_frame,values=[str(i) for i in range(1, 21)])
 entry_quantity.pack(pady=2)
+
+current_date = date.today().strftime("%d-%m-%Y")
+follow_up_date = (date.today() + timedelta(days=7)).strftime("%d-%m-%Y")
+tk.Label(new_order_menu_frame, text=f"Order Date: {current_date}", bg="#eddea7").pack(pady=2)
+tk.Label(new_order_menu_frame, text=f"Follow-Up By: {follow_up_date}", bg="#eddea7").pack(pady=2)
 
 # Random receipt generator
 def generate_receipt_number():
