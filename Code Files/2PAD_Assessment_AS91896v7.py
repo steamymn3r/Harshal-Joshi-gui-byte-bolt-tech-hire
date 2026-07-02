@@ -80,7 +80,7 @@ def return_order_menu_build():
 # --- DATA LOGIC CONSTRUCTORS ---
 
 def process_item_data(index):
-    """Tracks checklist manipulations in real time."""
+    # Tracks checklist manipulations in real time.
     item_name = item_list[index][0]
     if checkbox_vars[index].get() == 1:
         if item_name not in selected_items:
@@ -90,7 +90,7 @@ def process_item_data(index):
             selected_items.remove(item_name)
 
 def save_order_action():
-    """Validates inputs and saves data directly to flat text files."""
+    # Validates inputs and saves data directly to flat text files
     if entry_name_new_order is None:
         messagebox.showerror("Error", "The new order form is not ready yet.")
         return
@@ -132,7 +132,7 @@ def save_order_action():
         messagebox.showerror("Error", f"Could not save file: {str(e)}")
 
 def show_order_action():
-    """Reads transactional customer logs out loud via native OS alerts."""
+    # Reads transactional customer logs out loud via native OS alerts.
     if not os.path.exists(filename) or os.path.getsize(filename) == 0:
         messagebox.showerror("No Data", "No files or records found.")
         return
@@ -147,7 +147,7 @@ def show_order_action():
 
 
 def return_order_action():
-    """Finds one matching order by customer name or receipt number and removes that one record."""
+    # Finds one matching order by customer name or receipt number and removes that one record.
     name_a = str(entry_name_return.get()).strip()
     receipt_number = str(entry_receipt.get()).strip()
 
@@ -193,8 +193,8 @@ def return_order_action():
 
 
 # Frame 1: Home Screen Layout Setup
-main_menu_frame = tk.Frame(root, bg="#e8e2c8", borderwidth=10, relief="ridge")
-tk.Label(main_menu_frame, text="Welcome to Byte & Bolt!", font=("Garamond", 18, "bold"), bg="#cbc2a3").pack(pady=20)
+main_menu_frame = tk.Frame(root, bg="#aeb0b1", borderwidth=10, relief="ridge")
+tk.Label(main_menu_frame, text="Welcome to Byte & Bolt!", font=("Garamond", 18, "bold"), bg="#cdd4d4").pack(pady=20)
 
 tk.Button(main_menu_frame, text="New Order Page", bg="#635dff", fg="white", command=new_order_menu_build, width=25).pack(pady=5)
 tk.Button(main_menu_frame, text="Show Existing Orders", bg="#635dff", fg="white", command=show_order_action, width=25).pack(pady=5)
@@ -220,28 +220,28 @@ if file_path.exists():
 else:
     print(f"Warning: image not found at {file_path}")
 # Frame 2: New Order Screen Layout Setup
-new_order_menu_frame = tk.Frame(root, bg="#fff6d6", borderwidth=10, relief="ridge")
-tk.Label(new_order_menu_frame, text="Create New Hire Order", font=("Garamond", 14, "bold"), bg="#eddea7").pack(pady=5)
+new_order_menu_frame = tk.Frame(root, bg="#9e9e9e", borderwidth=10, relief="ridge")
+tk.Label(new_order_menu_frame, text="Create New Hire Order", font=("Garamond", 14, "bold"), bg="#a7dded").pack(pady=5)
 
 # Customer metadata forms
-tk.Label(new_order_menu_frame, text="Customer Name:", bg="#eddea7").pack()
+tk.Label(new_order_menu_frame, text="Customer Name:", bg="#9aa0a7").pack()
 entry_name_new_order = tk.Entry(new_order_menu_frame)
 entry_name_new_order.pack(pady=2)
 
-tk.Label(new_order_menu_frame, text="Quantity Wanted:", bg="#eddea7").pack()
+tk.Label(new_order_menu_frame, text="Quantity Wanted:", bg="#9aa0a7").pack()
 entry_quantity = ttk.Combobox(new_order_menu_frame,values=[str(i) for i in range(1, 21)])
 entry_quantity.pack(pady=2)
 
 current_date = date.today().strftime("%d-%m-%Y")
 follow_up_date = (date.today() + timedelta(days=7)).strftime("%d-%m-%Y")
-tk.Label(new_order_menu_frame, text=f"Order Date: {current_date}", bg="#eddea7").pack(pady=2)
-tk.Label(new_order_menu_frame, text=f"Follow-Up By: {follow_up_date}", bg="#eddea7").pack(pady=2)
+tk.Label(new_order_menu_frame, text=f"Order Date: {current_date}", bg="#a7adaf").pack(pady=2)
+tk.Label(new_order_menu_frame, text=f"Follow-Up By: {follow_up_date}", bg="#a7adaf").pack(pady=2)
 
 # Random receipt generator
 def generate_receipt_number():
     return f"R{random.randint(0000, 9999)}"
 
-tk.Label(new_order_menu_frame, text=f"Receipt Number: {generate_receipt_number()}", bg="#eddea7").pack(pady=5)
+tk.Label(new_order_menu_frame, text=f"Receipt Number: {generate_receipt_number()}", bg="#a7dded").pack(pady=5)
 
 # Dynamic scrollable container block for equipment listings
 canvas_container = tk.Frame(new_order_menu_frame, bd=1, relief="sunken")
@@ -264,14 +264,14 @@ tk.Button(new_order_menu_frame, text="Cancel & Back", bg="#e81313", fg="white", 
 
 
 # Frame 3: Return Order Screen Layout Setup
-return_order_menu_frame = tk.Frame(root, bg="#d4c893", borderwidth=10, relief="ridge")
-tk.Label(return_order_menu_frame, text="Equipment Return Portal", font=("Garamond", 14, "bold"), bg="#AFA273").pack(pady=10)
+return_order_menu_frame = tk.Frame(root, bg="#707a7a", borderwidth=10, relief="ridge")
+tk.Label(return_order_menu_frame, text="Equipment Return Portal", font=("Garamond", 14, "bold"), bg="#B6B6B6").pack(pady=10)
 
-tk.Label(return_order_menu_frame, text="Customer Name:", bg="#AFA273").pack()
+tk.Label(return_order_menu_frame, text="Customer Name:", bg="#BDBCBC").pack()
 entry_name_return = tk.Entry(return_order_menu_frame)
 entry_name_return.pack(pady=2)
 
-tk.Label(return_order_menu_frame, text="Receipt Number", bg= "#AFA273").pack()
+tk.Label(return_order_menu_frame, text="Receipt Number", bg= "#BDBCBC").pack()
 entry_receipt = tk.Entry(return_order_menu_frame)
 entry_receipt.pack(pady=2)
 
