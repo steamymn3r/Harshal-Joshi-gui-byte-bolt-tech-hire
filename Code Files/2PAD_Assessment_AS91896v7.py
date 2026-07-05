@@ -1,6 +1,6 @@
 # Author: Harshal Joshi
 # Purpose: To create a GUI application for Byte and Bolt Tech Hire
-# Date: 29 - 5 - 2026 (first edited)
+# Date: 29 - 5 - 2026
 
 # Import libraries here.
 import tkinter as tk
@@ -15,10 +15,12 @@ import re
 # Main window setup
 root = tk.Tk()
 root.title("Byte & Bolt Tech Hire")
-root.geometry("500x600")  # Slightly taller to accommodate the single-window layout
+root.geometry("500x600")
 
-# Persistent storage configurations
+# Savefile that stores all orders
 filename = "savefile.txt"
+
+# List of all possible items available for purchase
 item_list = [
     ["ACC 1 Keyboard", 20], ["ACC 1 Mouse", 15], ["Execute PC", 60], ["ARD4T 672a Laptop", 32], ["33Gi Headset", 17],
     ["ACT 2 Keyboard", 25], ["ACT 2 Mouse", 25], ["Muscle PC", 70], ["TR4G0N 884b Laptop", 38], ["36I8 Headset", 27],
@@ -26,26 +28,32 @@ item_list = [
     ["ARf 4 Keyboard", 22], ["ARf 4 Mouse", 17], ["Torrential PC", 65], ["TAB1TH 553d Laptop", 35], ["25yR Headset", 22]
 ]
 
-# Tracking states
+# Declaring variables that will be used throughout the entire code here.
 checkbox_vars = []
 selected_items = []
 entry_name_new_order = None
 entry_name_return = None
 entry_quantity = None
 order_date = None
+search_matches = []
+
 # Date picker widgets
 day_cb = None
 month_cb = None
 year_cb = None
 follow_up_var = None
+
 # New tracking for return-by-item feature
 orders_listbox = None
 order_items_frame = None
 item_checkbox_vars = []
 loaded_order_index = None
 loaded_order_text = None
-# --- NAVIGATION FLOW CONTROLLERS ---
 
+# Declaring frames to display parts of the gui.
+# The setup works by refreshing a single frame with other frames of the program.
+
+# Main menu frame which essentially acts as a gateway to the other frames.
 def main_menu_build():
     """Brings up the starting screen."""
     new_order_menu_frame.pack_forget()
@@ -91,8 +99,10 @@ def return_order_menu_build():
     return_order_menu_frame.pack(padx=20, pady=20, fill="both", expand=True)
 
 
-# --- DATA LOGIC CONSTRUCTORS ---
+# End of frame building, now starts the main backbone; processing orders, saving orders,
+# showing orders, and returing orders.
 
+# Processes orders to be ready for saving
 def process_item_data(index):
     # Tracks checklist manipulations in real time.
     item_name = item_list[index][0]
@@ -103,6 +113,7 @@ def process_item_data(index):
         if item_name in selected_items:
             selected_items.remove(item_name)
 
+# Rewrites the savefile to add a new order.
 def save_order_action():
     # Validates inputs and saves data directly to flat text files
     if entry_name_new_order is None:
@@ -158,6 +169,8 @@ def save_order_action():
     except Exception as e:
         messagebox.showerror("Error", f"Could not save file: {str(e)}")
 
+
+# Shows all orders written into the savefile.
 def show_order_action():
     # Reads transactional customer logs out loud via native OS alerts.
     if not os.path.exists(filename) or os.path.getsize(filename) == 0:
@@ -172,7 +185,7 @@ def show_order_action():
     else:
         messagebox.showinfo("Data", data)
 
-
+# Rewrites the savefile to not include returned orders.
 def return_order_action():
     # Finds one matching order by customer name or receipt number and removes that one record.
     name_a = str(entry_name_return.get()).strip()
@@ -219,10 +232,8 @@ def return_order_action():
         messagebox.showerror("Error", f"Could not process return: {str(e)}")
 
 
-# Functions for item-level returns ---
-search_matches = []
-
-def search_orders_for_return():
+# Searches savefile for return
+def search_order_return():
     """Populate the orders_listbox with matching orders by name or receipt."""
     global search_matches
     search_matches.clear()
@@ -257,7 +268,9 @@ def search_orders_for_return():
         messagebox.showinfo("No Matches", "No orders matched your search.")
 
 
-def load_order_items_from_listbox():
+
+# Loads item orders for the things needed to be returned.
+def load_order_items():
     """Load items for the selected order into the item checkbox panel."""
     global item_checkbox_vars, loaded_order_index, loaded_order_text
     item_checkbox_vars.clear()
@@ -304,7 +317,7 @@ def load_order_items_from_listbox():
     messagebox.showinfo("Loaded", f"Loaded {len(items)} item(s) for return.")
 
 
-def return_selected_items_action():
+def return_selected_items():
     """Return selected individual items from the loaded order."""
     global loaded_order_index, loaded_order_text
     if loaded_order_index is None or loaded_order_text is None:
@@ -411,6 +424,8 @@ if file_path.exists():
         print(f"Warning: could not load image: {e}")
 else:
     print(f"Warning: image not found at {file_path}")
+
+
 # Frame 2: New Order Screen Layout Setup
 new_order_menu_frame = tk.Frame(root, bg="#9e9e9e", borderwidth=10, relief="ridge")
 tk.Label(new_order_menu_frame, text="Create New Hire Order", font=("Garamond", 14, "bold"), bg="#9aa0a7").pack(pady=5)
@@ -513,8 +528,8 @@ listbox_scroll = tk.Scrollbar(listbox_container, orient='vertical', command=orde
 listbox_scroll.pack(side='right', fill='y')
 orders_listbox.configure(yscrollcommand=listbox_scroll.set)
 
-tk.Button(return_order_menu_frame, text="Search Matching Orders", bg="#4aa3ff", fg="white", command=lambda: search_orders_for_return()).pack(pady=5)
-tk.Button(return_order_menu_frame, text="Load Selected Order Items", bg="#4aa3ff", fg="white", command=lambda: load_order_items_from_listbox()).pack(pady=5)
+tk.Button(return_order_menu_frame, text="Search Matching Orders", bg="#4aa3ff", fg="white", command=lambda: search_order_return()).pack(pady=5)
+tk.Button(return_order_menu_frame, text="Load Selected Order Items", bg="#4aa3ff", fg="white", command=lambda: load_order_items()).pack(pady=5)
 
 # Frame where individual item checkboxes will be placed; allow it to expand so bottom buttons remain visible
 order_items_frame = tk.Frame(return_order_menu_frame, bd=1, relief='sunken', bg='white')
@@ -523,7 +538,7 @@ order_items_frame.pack(fill='both', pady=5, padx=5, expand=True)
 # Bottom frame with actions that must remain visible
 return_bottom_frame = tk.Frame(return_order_menu_frame, bg=return_order_menu_frame.cget('bg'))
 return_bottom_frame.pack(fill='x', side='bottom', pady=5)
-tk.Button(return_bottom_frame, text="Return Selected Items", bg="#635dff", fg="white", command=lambda: return_selected_items_action()).pack(side='left', padx=5)
+tk.Button(return_bottom_frame, text="Return Selected Items", bg="#635dff", fg="white", command=lambda: return_selected_items()).pack(side='left', padx=5)
 tk.Button(return_bottom_frame, text="Return to Main Menu", bg="#e81313", fg="white", command=main_menu_build).pack(side='right', padx=5)
 
 
