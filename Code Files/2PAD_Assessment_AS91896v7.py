@@ -1,6 +1,6 @@
 # Author: Harshal Joshi
 # Purpose: To create a GUI application for Byte and Bolt Tech Hire
-# Date: 29 - 5 - 2026
+# Date: 29 - 5 - 2026 (first edited)
 
 # Import libraries here.
 import tkinter as tk
@@ -501,6 +501,7 @@ return_top_frame = tk.Frame(return_order_menu_frame, bg=return_order_menu_frame.
 return_top_frame.pack(fill='x', pady=2)
 tk.Button(return_top_frame, text="Show Existing Orders & Search Orders", bg="#635dff", fg="white", command=show_order_action).pack(side='left', padx=5, pady=5)
 tk.Button(return_top_frame, text="Return 1 Order", bg = "#635dff", fg="white", command=return_order_action).pack(side='left', padx=5, pady=5)
+tk.Button(return_top_frame, text="Return to Main Menu", bg="#e81313", fg="white", command=main_menu_build).pack(side='right', padx=5, pady=5)
 
 # Individual item release (middle area)
 listbox_container = tk.Frame(return_order_menu_frame)
@@ -522,7 +523,6 @@ order_items_frame.pack(fill='both', pady=5, padx=5, expand=True)
 return_bottom_frame = tk.Frame(return_order_menu_frame, bg=return_order_menu_frame.cget('bg'))
 return_bottom_frame.pack(fill='x', side='bottom', pady=5)
 tk.Button(return_bottom_frame, text="Return Selected Items", bg="#635dff", fg="white", command=lambda: return_selected_items()).pack(side='left', padx=5)
-tk.Button(return_bottom_frame, text="Return to Main Menu", bg="#e81313", fg="white", command=main_menu_build).pack(side='right', padx=5)
 
 
 
