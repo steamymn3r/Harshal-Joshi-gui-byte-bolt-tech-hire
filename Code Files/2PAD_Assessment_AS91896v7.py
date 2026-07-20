@@ -12,6 +12,9 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 import re
 
+
+os.environ["TK_SILENCE_DEPRECATION"] = "1"
+
 # Main window setup
 root = tk.Tk()
 root.title("Byte & Bolt Tech Hire")
@@ -405,26 +408,6 @@ tk.Button(main_menu_frame, text="New Order Page", bg="#635dff", fg="white", comm
 tk.Button(main_menu_frame, text="Show Existing Orders", bg="#635dff", fg="white", command=show_order_action, width=25).pack(pady=5)
 tk.Button(main_menu_frame, text="Return Order Page", bg="#635dff", fg="white", command=return_order_menu_build, width=25).pack(pady=5)
 tk.Button(main_menu_frame, text="Exit Application", bg="#e81313", fg="white", command=root.destroy, width=25).pack(pady=20)
-
-
-file_path = Path(__file__).resolve().parent.parent / "Images" / "Logo.png"
-if file_path.exists():
-    try:
-        png_image = tk.PhotoImage(file=str(file_path))
-        try:
-            image_to_use = png_image.subsample(9, 9)
-        except Exception:
-            image_to_use = png_image
-        image_frame = tk.Frame(main_menu_frame)
-        image_label = tk.Label(image_frame, image=image_to_use)
-        image_frame.place(x=350, y=10)
-        image_frame.configure(bg="#edf5ff")
-        image_label.pack()
-    except Exception as e:
-        print(f"Warning: could not load image: {e}")
-else:
-    print(f"Warning: image not found at {file_path}")
-
 
 # Frame 2: New Order Screen Layout Setup
 new_order_menu_frame = tk.Frame(root, bg="#9e9e9e", borderwidth=10, relief="ridge")
