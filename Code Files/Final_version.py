@@ -513,6 +513,14 @@ def return_selected_items():
 main_menu_frame = tk.Frame(root, bg="#aeb0b1", borderwidth=10, relief="ridge")
 tk.Label(main_menu_frame, text="Welcome to Byte & Bolt!", font=("Garamond", 18, "bold"), bg="#bdbdbd").pack(pady=20)
 
+png_image = tk.PhotoImage(file="Logo.png")
+resized_img = png_image.subsample(9, 9)
+image_frame = tk.Frame(root)
+image_label = tk.Label(image_frame, image=resized_img)
+image_frame.place(x=350,y=10)
+image_frame.configure(bg="#edf5ff")
+image_label.pack()
+
 tk.Button(main_menu_frame, text="New Order Page", bg="#635dff", fg="white", command=new_order_menu_build, width=25).pack(pady=5)
 tk.Button(main_menu_frame, text="Show Existing Orders", bg="#635dff", fg="white", command=show_order_action, width=25).pack(pady=5)
 tk.Button(main_menu_frame, text="Return Order Page", bg="#635dff", fg="white", command=return_order_menu_build, width=25).pack(pady=5)
