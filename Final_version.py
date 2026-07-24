@@ -13,7 +13,6 @@ from pathlib import Path
 import re
 
 
-os.environ["TK_SILENCE_DEPRECATION"] = "1"
 
 # Main window setup
 root = tk.Tk()
