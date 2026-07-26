@@ -586,6 +586,7 @@ year_combo_box.pack(side="left", padx=2)
 follow_up_var = tk.StringVar(value=(today + timedelta(days=7)).strftime("%d-%m-%Y"))
 tk.Label(date_frame, textvariable=follow_up_var, bg="#9aa0a7", width=12).pack(side="left", padx=5)
 
+# Calculates the follow up date to the date entered in the new order menu.
 def _update_follow_up(event=None):
     try:
         d = int(day_combo_box.get())
