@@ -1,15 +1,15 @@
 # Author: Harshal Joshi
-# Purpose: To create a GUI application for Byte and Bolt Tech Hire
-# Date: 29 - 5 - 2026 (first edited)
+# Purpose: To create a GUI based application for Byte and Bolt Tech Hire
+# Date: 29/05/2026 (first edited)
 
 # Import libraries here.
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 import random
-import os
+import os # allows the program to access the native OS
 from datetime import date, datetime, timedelta
-import re
+import re # provides support for regular expressions, allowing manipulation to the string via character specific patterns
 from PIL import Image, ImageTk
 
 os.environ["TK_SILENCE_DEPRECATION"] = "1"
@@ -32,21 +32,21 @@ item_list = [
 ]
 
 # Declaring variables that will be used throughout the entire corder_datee here.
-checkbox_vars = []
-selected_items = []
-entry_name_new_order = None
-entry_name_return = None
-entry_quantity = None
+checkbox_vars = [] # Checks whether a checkbox is selected or not
+selected_items = [] # Stores the selected item
+entry_name_new_order = None # New order entry field for name
+entry_name_return = None # Entry field on return menu for name
+entry_quantity = None # Entry field for quantity 
 order_date = None
-search_matches = []
+search_matches = [] # Used in the return order menu to find related orders.
 
 # Date picker widgets
 day_combo_box = None
 month_combo_box = None
 year_combo_box = None
-follow_up_var = None
+follow_up_date = None # Follow up date
 
-# New tracking for return-by-item feature
+# Tracking all items
 orders_listbox = None
 order_items_frame = None
 item_checkbox_vars = []
@@ -58,6 +58,14 @@ shopping_cart = {}  # {item_name: quantity}
 cart_display_frame = None
 cart_total_var = None
 item_spinners = {}  # {item_name: StringVar for quantity}
+
+
+# Reused variables for fonts 
+font_spam_size_12 = ("Garamond", 12, "bold")
+font_spam_size_9 = ("Garamond", 9, "bold")
+font_spam_size_8 = ("Garamond", 8)
+font_spam_size_7 = ("Garamond", 7)
+title_spam_size_18 = ("Garamond", 18, "bold")
 
 ## Declaring frames to display parts of the GUI.
 
@@ -91,6 +99,8 @@ def return_order_menu_build():
 
 ## Functions that are essential to the program.
 
+
+# Declares the date of when the order was ordered
 def get_order_datetime():
     if day_combo_box and month_combo_box and year_combo_box:
         try:
@@ -102,53 +112,54 @@ def get_order_datetime():
             raise ValueError("Please select a valid order date.") from exc
     return datetime.now()
 
-
+# Gathers the total amounts of the price and items in the order
 def get_cart_totals():
     total_price = 0
     total_items = 0
 
     for item_name in shopping_cart:
-        qty = shopping_cart[item_name]
+        quantity = shopping_cart[item_name]
         price = next((item[1] for item in item_list if item[0] == item_name), 0)
-        item_total = qty * price
+        item_total = quantity * price
         total_price += item_total
-        total_items += qty
+        total_items += quantity
 
     return total_price, total_items
 
-
-def read_order_lines():
+# Reads the savefile (does not overwrite in any way)
+# Is a function to be able to be called at any given time, as there are two total buttons
+# scattered throughout the program that have this exact purpose
+def read_orders():
     if not os.path.exists(filename) or os.path.getsize(filename) == 0:
         return []
 
     with open(filename, "r") as f:
         return [line.rstrip("\n") for line in f if line.strip()]
 
-
+# Used by the return menu to find related orders using the users' name and/ or receipt number
 def get_matching_order_entries(name_entry="", receipt_number=""):
-    lines = read_order_lines()
+    lines = read_orders()
     matches = []
 
-    for idx, line in enumerate(lines):
+    for index, line in enumerate(lines):
         line_lower = line.lower()
         if receipt_number and receipt_number.lower() in line_lower:
-            matches.append((idx, line))
+            matches.append((index, line))
         elif name_entry and f"customer: {name_entry}".lower() in line_lower:
-            matches.append((idx, line))
+            matches.append((index, line))
         elif not receipt_number and not name_entry:
-            matches.append((idx, line))
+            matches.append((index, line))
 
     return matches
 
 
 # Adds item to the new order cart
 def add_item_to_cart(item_name, item_price):
-    # Add item in goorder_date quantity
     global shopping_cart
-    qty_text = item_spinners[item_name].get().strip()
+    quantity_text = item_spinners[item_name].get().strip()
     try:
-        qty = int(qty_text)
-        if qty < 1 or qty > 20:
+        quantity = int(quantity_text)
+        if quantity < 1 or quantity > 20:
             messagebox.showerror("Error", "Quantity must be between 1 and 20.")
             return
     except ValueError:
@@ -159,18 +170,17 @@ def add_item_to_cart(item_name, item_price):
     # recorded twice, rather than showing as a second iteration of the prorder_dateuct. E.g ACC 1 Keyboard x1 ACC 1 Keyboard
     # -> ACC 1 Keyboard x2
     if item_name in shopping_cart:
-        shopping_cart[item_name] += qty
+        shopping_cart[item_name] += quantity
     else:
-        shopping_cart[item_name] = qty
+        shopping_cart[item_name] = quantity
     
     item_spinners[item_name].set("1")  # Reset spinner to 1
     update_cart_display()
-    messagebox.showinfo("Added", f"Added {qty}x {item_name} to cart.")
+    messagebox.showinfo("Added", f"Added {quantity}x {item_name} to cart.")
 
 
-# Removes item fom the new order cart
+# Removes item fom the New Order menu cart
 def remove_item_from_cart(item_name):
-    # Remove item(s) from the new order shopping cart
     global shopping_cart
     if item_name in shopping_cart:
         del shopping_cart[item_name]
@@ -192,22 +202,22 @@ def update_cart_display():
 
     # Display each item in cart through a for loop
     for item_name in shopping_cart:
-        qty = shopping_cart[item_name]
+        quantity = shopping_cart[item_name]
         price = next((item[1] for item in item_list if item[0] == item_name), 0)
-        item_total = qty * price
+        item_total = quantity * price
 
         item_row = tk.Frame(cart_display_frame, bg="white", relief="solid", bd=1)
         item_row.pack(fill="x", padx=5, pady=2)
 
         # Item info
-        item_info = f"{item_name} x{qty} = ${item_total}"
+        item_info = f"{item_name} x{quantity} = ${item_total}"
         tk.Label(item_row, text=item_info, bg="white", anchor="w", justify="left").pack(side="left", fill="x", expand=True, padx=5, pady=5)
 
         # Remove button
         tk.Button(item_row, text="Remove", bg="#e81313", fg="white", width=8,
                  command=lambda name=item_name: remove_item_from_cart(name)).pack(side="right", padx=5, pady=2)
 
-    cart_total_var.set(f"Total ({total_items} items): ${total_price:.2f}")
+    cart_total_var.set(f"Total ({total_items} items): ${total_price:.2f}") # .2f allows for rounding of value to 2 decimal places (12.5 -> 12.50)
 
 # Rewrites the savefile to add a new order.
 def save_order_action():
@@ -222,7 +232,7 @@ def save_order_action():
     if name_entry == "":
         messagebox.showerror("Error", "Please enter your name.")
         return
-    if not re.match(r"^[A-Za-z ]+$", name_entry):
+    if not re.match(r"^[A-Za-z ]+$", name_entry): # Goes through the name entry space to check whether or not name follows criterion
         messagebox.showerror("Error", "Name must contain only letters and spaces.")
         return
 
@@ -236,11 +246,11 @@ def save_order_action():
         order_time = order_dt.strftime("%H:%M:%S")
         follow_up_date = (order_dt.date() + timedelta(days=7)).strftime("%d-%m-%Y")
 
-        items_ordered = ", ".join([f"{item} x{qty}" for item, qty in shopping_cart.items()])
-        total_qty = sum(shopping_cart.values())
+        items_ordered = ", ".join([f"{item} x{quantity}" for item, quantity in shopping_cart.items()])
+        total_quantity = sum(shopping_cart.values())
 
         with open(filename, "a") as f:
-            f.write(f"Date Ordered: {order_date_text} {order_time} | Follow-Up By: {follow_up_date} | Customer: {name_entry} | Items: {items_ordered} | Qty: {total_qty} | Receipt Number: {receipt_number}\n")
+            f.write(f"Date Ordered: {order_date_text} {order_time} | Follow-Up By: {follow_up_date} | Customer: {name_entry} | Items: {items_ordered} | quantity: {total_quantity} | Receipt Number: {receipt_number}\n")
 
         messagebox.showinfo("Success", f"Order saved successfully!\nFollow-up by: {follow_up_date}")
         main_menu_build()
@@ -290,10 +300,10 @@ ITEMS ORDERED:
     total_price, total_items = get_cart_totals()
 
     for item_name in shopping_cart:
-        qty = shopping_cart[item_name]
+        quantity = shopping_cart[item_name]
         price = next((item[1] for item in item_list if item[0] == item_name), 0)
-        item_total = qty * price
-        receipt_text += f"{item_name}\n  Qty: {qty} x ${price} = ${item_total}\n"
+        item_total = quantity * price
+        receipt_text += f"{item_name}\n  quantity: {quantity} x ${price} = ${item_total}\n"
 
     receipt_text += f"""
 {'-'*50}
@@ -311,7 +321,7 @@ Thank you for your business!
 # Shows all orders written into the savefile.
 def show_order_action():
     # Reads transactional customer logs out loud via native OS alerts.
-    lines = read_order_lines()
+    lines = read_orders()
     data = "\n".join(lines).strip()
 
     if data == "":
@@ -333,9 +343,9 @@ def return_order_action():
     if not os.path.exists(filename) or os.path.getsize(filename) == 0:
         messagebox.showerror("Error", "No orders found to return.")
         return
-
+    # Matching entires provided by the earlier function get_matching_order_entries. 
     try:
-        lines = read_order_lines()
+        lines = read_orders()
         matching_entries = get_matching_order_entries(name_entry, receipt_number)
 
         if not matching_entries:
@@ -392,22 +402,24 @@ def load_order_items():
     for w in order_items_frame.winfo_children():
         w.destroy()
 
+    # sel is checking whether or not any orders in the listbox (loaded in program)
+    # are actually there
     sel = orders_listbox.curselection()
     if not sel:
         messagebox.showerror("Error", "Please select an order from the list first.")
         return
 
-    sel_idx = sel[0]
+    sel_index = sel[0]
     try:
-        loaded_order_index, loaded_order_text = search_matches[sel_idx]
+        loaded_order_index, loaded_order_text = search_matches[sel_index]
     except Exception:
         messagebox.showerror("Error", "Selected order could not be located.")
         return
 
     # Parse items from the order line
-    parts = [p.strip() for p in loaded_order_text.split("|")]
+    parts_of_order = [p.strip() for p in loaded_order_text.split("|")]
     items_field = None
-    for p in parts:
+    for p in parts_of_order:
         if p.lower().startswith("items:"):
             items_field = p
             break
@@ -454,23 +466,23 @@ def return_selected_items():
             messagebox.showerror("Error", "The order could not be found in the file anymore.")
             return
 
-        orig_line = lines[loaded_order_index]
-        parts = [p.strip() for p in orig_line.split("|")]
+        original_line = lines[loaded_order_index]
+        parts_of_order = [p.strip() for p in original_line.split("|")]
 
-        # extract items and qty
-        items_field_idx = None
-        qty_field_idx = None
-        for i, p in enumerate(parts):
+        # Extract items and quantity
+        items_field_index = None
+        quantity_field_index = None
+        for i, p in enumerate(parts_of_order):
             if p.lower().startswith("items:"):
-                items_field_idx = i
-            if p.lower().startswith("qty:"):
-                qty_field_idx = i
+                items_field_index = i
+            if p.lower().startswith("quantity:"):
+                quantity_field_index = i
 
-        if items_field_idx is None:
+        if items_field_index is None:
             messagebox.showerror("Error", "Could not parse items from the order.")
             return
 
-        items_text = parts[items_field_idx].split(":", 1)[1].strip()
+        items_text = parts_of_order[items_field_index].split(":", 1)[1].strip()
         current_items = [it.strip() for it in items_text.split(",") if it.strip()]
 
         # Remove selected items
@@ -484,17 +496,17 @@ def return_selected_items():
                     f.write("\n".join(lines) + "\n")
             messagebox.showinfo("Returned", "All selected items returned and order removed.")
         else:
-            # update items field and adjust qty (best-effort)
-            parts[items_field_idx] = f"Items: {', '.join(remaining_items)}"
-            if qty_field_idx is not None:
+            # update items field and adjust quantity (best-effort)
+            parts_of_order[items_field_index] = f"Items: {', '.join(remaining_items)}"
+            if quantity_field_index is not None:
                 try:
-                    orig_qty = int(parts[qty_field_idx].split(":", 1)[1].strip())
-                    new_qty = max(1, orig_qty - len(selected))
-                    parts[qty_field_idx] = f"Qty: {new_qty}"
+                    original_quantity = int(parts_of_order[quantity_field_index].split(":", 1)[1].strip())
+                    new_quantity = max(1, original_quantity - len(selected))
+                    parts_of_order[quantity_field_index] = f"quantity: {new_quantity}"
                 except Exception:
                     pass
 
-            new_line = " | ".join(parts)
+            new_line = " | ".join(parts_of_order)
             lines[loaded_order_index] = new_line
             with open(filename, "w") as f:
                 f.write("\n".join(lines) + "\n")
@@ -514,29 +526,16 @@ def return_selected_items():
 
 # Frame 1: Home Screen Layout Setup
 main_menu_frame = tk.Frame(root, bg="#aeb0b1", borderwidth=10, relief="ridge")
-tk.Label(main_menu_frame, text="Welcome to Byte & Bolt!", font=("Garamond", 18, "bold"), bg="#bdbdbd").pack(pady=20)
+tk.Label(main_menu_frame, text="Welcome to Byte & Bolt!", font = title_spam_size_18, bg="#bdbdbd").pack(pady=20)
 
-# 1. Open the original image file
 raw_img = Image.open("Images/Logo.png")
-
-# 2. Extract dimensions safely
-orig_width, orig_height = raw_img.size
-
-# 3. Calculate new dimensions (simulating your original .subsample(5, 5))
-new_width = orig_width // 5
-new_height = orig_height // 5
-
-# 4. Create the resized raw Pillow object
+original_width, original_height = raw_img.size
+new_width = original_width // 5
+new_height = original_height // 5
 resized_pil_img = raw_img.resize((new_width, new_height), Image.Resampling.LANCZOS)
-
-# 5. CONVERT to Tkinter format (This variable MUST be used in your widget)
 png_image = ImageTk.PhotoImage(resized_pil_img)
-
-# 6. Create the layout frame using standard tkinter (tk)
 image_frame = tk.Frame(root)  # Replace 'root' with your parent window variable name if different
 image_frame.pack()
-
-# 7. Create the display Label using the correct 'png_image' variable
 image_label = tk.Label(image_frame, image=png_image)
 image_label.image = png_image  # Explicitly save reference to prevent garbage collection
 image_label.pack()
@@ -553,7 +552,7 @@ new_order_menu_frame = tk.Frame(root, bg="#9e9e9e", borderwidth=10, relief="ridg
 # Compact header with customer info and date on one row
 header_frame = tk.Frame(new_order_menu_frame, bg="#9aa0a7")
 header_frame.pack(fill="x", padx=5, pady=3)
-tk.Label(header_frame, text="Create New Hire Order", font=("Garamond", 12, "bold"), bg="#9aa0a7").pack(side="left", padx=5)
+tk.Label(header_frame, text="Create New Hire Order", font = font_spam_size_12, bg="#9aa0a7").pack(side="left", padx=5)
 
 # Customer name entry
 tk.Label(new_order_menu_frame, text="Name:", bg="#9aa0a7").pack()
@@ -582,8 +581,8 @@ year_combo_box = ttk.Combobox(date_frame, values=year_values, width=4)
 year_combo_box.set(str(today.year))
 year_combo_box.pack(side="left", padx=2)
 
-follow_up_var = tk.StringVar(value=(today + timedelta(days=7)).strftime("%d-%m-%Y"))
-tk.Label(date_frame, textvariable=follow_up_var, bg="#9aa0a7", width=12).pack(side="left", padx=5)
+follow_up_date = tk.StringVar(value=(today + timedelta(days=7)).strftime("%d-%m-%Y"))
+tk.Label(date_frame, textvariable=follow_up_date, bg="#9aa0a7", width=12).pack(side="left", padx=5)
 
 # Calculates the follow up date to the date entered in the new order menu.
 def _update_follow_up(event=None):
@@ -592,9 +591,9 @@ def _update_follow_up(event=None):
         m = int(month_combo_box.get())
         y = int(year_combo_box.get())
         order_date = date(year=y, month=m, day=d)
-        follow_up_var.set((order_date + timedelta(days=7)).strftime("%d-%m-%Y"))
+        follow_up_date.set((order_date + timedelta(days=7)).strftime("%d-%m-%Y"))
     except Exception:
-        follow_up_var.set("Invalid date")
+        follow_up_date.set("Invalid date")
 
 for cb in (day_combo_box, month_combo_box, year_combo_box):
     cb.bind("<<ComboboxSelected>>", _update_follow_up)
@@ -608,7 +607,7 @@ content_frame = tk.Frame(new_order_menu_frame, bg="#9e9e9e")
 content_frame.pack(fill="both", expand=True, padx=5, pady=3)
 
 # Top section - Available Items (smaller)
-tk.Label(content_frame, text="Available Items", bg="#9aa0a7", font=("Garamond", 9, "bold")).pack(fill="x")
+tk.Label(content_frame, text="Available Items", bg="#9aa0a7", font = font_spam_size_9).pack(fill="x")
 canvas_container = tk.Frame(content_frame, bd=1, relief="sunken")
 canvas_container.pack(fill="x", expand=False, pady=2)
 
@@ -632,20 +631,20 @@ for item_data in item_list:
     item_frame.pack(fill="x", padx=2, pady=1)
     
     # Item name and price (compact)
-    tk.Label(item_frame, text=f"{item_name[:20]} ${item_price}", bg="white", anchor="w", width=24, font=("Garamond", 8)).pack(side="left", fill="x", expand=True)
+    tk.Label(item_frame, text=f"{item_name[:20]} ${item_price}", bg="white", anchor="w", width=24, font = font_spam_size_8).pack(side="left", fill="x", expand=True)
     
     # Quantity spinner
-    qty_var = tk.StringVar(value="1")
-    item_spinners[item_name] = qty_var
-    spinbox = tk.Spinbox(item_frame, from_=1, to=20, textvariable=qty_var, width=3, font=("Garamond", 8))
+    quantity_var = tk.StringVar(value="1")
+    item_spinners[item_name] = quantity_var
+    spinbox = tk.Spinbox(item_frame, from_=1, to=20, textvariable=quantity_var, width=3, font = font_spam_size_8)
     spinbox.pack(side="left", padx=1)
     
     # Add button
-    tk.Button(item_frame, text="Add", bg="#4aa3ff", fg="white", width=3, font=("Garamond", 7),
+    tk.Button(item_frame, text="Add", bg="#4aa3ff", fg="white", width=3, font = font_spam_size_7,
              command=lambda name=item_name, price=item_price: add_item_to_cart(name, price)).pack(side="left", padx=1)
 
 # Bottom section - Shopping Cart (larger, takes remaining space)
-tk.Label(content_frame, text="Shopping Cart", bg="#9aa0a7", font=("Garamond", 9, "bold")).pack(fill="x", pady=(5, 0))
+tk.Label(content_frame, text="Shopping Cart", bg="#9aa0a7", font = font_spam_size_9).pack(fill="x", pady=(5, 0))
 cart_container = tk.Frame(content_frame, bd=1, relief="sunken", bg="white")
 cart_container.pack(fill="both", expand=True)
 
@@ -663,19 +662,19 @@ cart_scrollbar.pack(side="right", fill="y")
 
 # Cart total label
 cart_total_var = tk.StringVar(value="Total: $0.00")
-tk.Label(new_order_menu_frame, textvariable=cart_total_var, bg="#9aa0a7", font=("Garamond", 9, "bold")).pack(pady=1)
+tk.Label(new_order_menu_frame, textvariable=cart_total_var, bg="#9aa0a7", font = font_spam_size_9).pack(pady=1)
 
 # Execution navigation triggers inside Order panel
 button_frame = tk.Frame(new_order_menu_frame, bg="#9e9e9e")
 button_frame.pack(fill="x", pady=2)
-tk.Button(button_frame, text="View Receipt", bg="#4aa3ff", fg="white", font=("Garamond", 8), command=generate_receipt).pack(side="left", padx=3, expand=True, fill="x")
-tk.Button(button_frame, text="Commit Order", bg="#635dff", fg="white", font=("Garamond", 8), command=save_order_action).pack(side="left", padx=3, expand=True, fill="x")
-tk.Button(button_frame, text="Cancel", bg="#e81313", fg="white", font=("Garamond", 8), command=main_menu_build).pack(side="left", padx=3, expand=True, fill="x")
+tk.Button(button_frame, text="View Receipt", bg="#4aa3ff", fg="white", font = font_spam_size_8, command=generate_receipt).pack(side="left", padx=3, expand=True, fill="x")
+tk.Button(button_frame, text="Commit Order", bg="#635dff", fg="white", font = font_spam_size_8, command=save_order_action).pack(side="left", padx=3, expand=True, fill="x")
+tk.Button(button_frame, text="Cancel", bg="#e81313", fg="white", font = font_spam_size_8, command=main_menu_build).pack(side="left", padx=3, expand=True, fill="x")
 
 
 # Frame 3: Return Order Screen Layout Setup
 return_order_menu_frame = tk.Frame(root, bg="#707a7a", borderwidth=10, relief="ridge")
-tk.Label(return_order_menu_frame, text="Equipment Return Portal", font=("Garamond", 12, "bold"), bg="#B6B6B6").pack(pady=3)
+tk.Label(return_order_menu_frame, text="Equipment Return Portal", font = font_spam_size_12, bg="#B6B6B6").pack(pady=3)
 
 # Compact input section
 input_frame = tk.Frame(return_order_menu_frame, bg="#707a7a")
@@ -692,22 +691,22 @@ entry_receipt.pack(side="left", padx=2)
 # Top buttons for navigation
 return_top_frame = tk.Frame(return_order_menu_frame, bg=return_order_menu_frame.cget('bg'))
 return_top_frame.pack(fill='x', pady=1, padx=5)
-tk.Button(return_top_frame, text="Search", bg="#4aa3ff", fg="white", font=("Garamond", 8), command=lambda: search_order_return()).pack(side='left', padx=2, expand=True, fill="x")
-tk.Button(return_top_frame, text="Load Items", bg="#635dff", fg="white", font=("Garamond", 8), command=lambda: load_order_items()).pack(side='left', padx=2, expand=True, fill="x")
-tk.Button(return_top_frame, text="Back", bg="#e81313", fg="white", font=("Garamond", 8), command=main_menu_build).pack(side='right', padx=2, expand=True, fill="x")
+tk.Button(return_top_frame, text="Search", bg="#4aa3ff", fg="white", font = font_spam_size_8, command=lambda: search_order_return()).pack(side='left', padx=2, expand=True, fill="x")
+tk.Button(return_top_frame, text="Load Items", bg="#635dff", fg="white", font = font_spam_size_8, command=lambda: load_order_items()).pack(side='left', padx=2, expand=True, fill="x")
+tk.Button(return_top_frame, text="Back", bg="#e81313", fg="white", font = font_spam_size_8, command=main_menu_build).pack(side='right', padx=2, expand=True, fill="x")
 
 # Order list section
-tk.Label(return_order_menu_frame, text="Orders:", bg="#BDBCBC", font=("Garamond", 8)).pack(anchor='w', padx=5, pady=(2, 0))
+tk.Label(return_order_menu_frame, text="Orders:", bg="#BDBCBC", font = font_spam_size_8).pack(anchor='w', padx=5, pady=(2, 0))
 listbox_container = tk.Frame(return_order_menu_frame, bd=1, relief='sunken')
 listbox_container.pack(pady=2, fill='both', expand=False, padx=5)
-orders_listbox = tk.Listbox(listbox_container, height=3, width=60, font=("Garamond", 7))
+orders_listbox = tk.Listbox(listbox_container, height=3, width=60, font = font_spam_size_7)
 orders_listbox.pack(side='left', fill='both', expand=True)
 listbox_scroll = tk.Scrollbar(listbox_container, orient='vertical', command=orders_listbox.yview)
 listbox_scroll.pack(side='right', fill='y')
 orders_listbox.configure(yscrollcommand=listbox_scroll.set)
 
 # Items to return section
-tk.Label(return_order_menu_frame, text="Items:", bg="#BDBCBC", font=("Garamond", 8)).pack(anchor='w', padx=5, pady=(2, 0))
+tk.Label(return_order_menu_frame, text="Items:", bg="#BDBCBC", font = font_spam_size_8).pack(anchor='w', padx=5, pady=(2, 0))
 order_items_container = tk.Frame(return_order_menu_frame, bd=1, relief='sunken', bg='white')
 order_items_container.pack(fill='both', expand=True, pady=2, padx=5)
 
@@ -723,11 +722,11 @@ items_canvas.configure(yscrollcommand=items_scrollbar.set)
 items_canvas.pack(side='left', fill='both', expand=True)
 items_scrollbar.pack(side='right', fill='y')
 
-# Bottom buttons - always visible
+# Bottom buttons that only return (either full order or selected items)
 return_bottom_frame = tk.Frame(return_order_menu_frame, bg=return_order_menu_frame.cget('bg'))
 return_bottom_frame.pack(fill='x', pady=2, padx=5)
-tk.Button(return_bottom_frame, text="Return Order", bg="#635dff", fg="white", font=("Garamond", 8), command=return_order_action).pack(side='left', padx=2, expand=True, fill="x")
-tk.Button(return_bottom_frame, text="Return Items", bg="#635dff", fg="white", font=("Garamond", 8), command=lambda: return_selected_items()).pack(side='left', padx=2, expand=True, fill="x")
+tk.Button(return_bottom_frame, text="Return Order", bg="#635dff", fg="white", font = font_spam_size_8, command=return_order_action).pack(side='left', padx=2, expand=True, fill="x")
+tk.Button(return_bottom_frame, text="Return Items", bg="#635dff", fg="white", font = font_spam_size_8, command=lambda: return_selected_items()).pack(side='left', padx=2, expand=True, fill="x")
 
 
 

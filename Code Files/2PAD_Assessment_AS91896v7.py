@@ -44,7 +44,7 @@ search_matches = []
 day_combo_box = None
 month_combo_box = None
 year_combo_box = None
-follow_up_var = None
+follow_up_date = None
 
 # New tracking for return-by-item feature
 orders_listbox = None
@@ -124,7 +124,7 @@ def save_order_action():
         return
 
     name_entry = str(entry_name_new_order.get()).strip()
-    qty = str(entry_quantity.get()).strip()
+    quantity = str(entry_quantity.get()).strip()
     receipt_number = str(generate_receipt_number()).strip()
     
     if name_entry == "":
@@ -139,10 +139,10 @@ def save_order_action():
         messagebox.showerror("Error", "Please select at least one item.")
         return
         
-    if qty == "" or not qty.isdigit():
+    if quantity == "" or not quantity.isdigit():
         messagebox.showerror("Error", "Please enter a valid numeric quantity.")
         return
-    if int(qty) < 1 or int(qty) > 20:
+    if int(quantity) < 1 or int(quantity) > 20:
         messagebox.showerror("Error", "Please enter a quantity between 1 and 20.")
         return
     try:
@@ -165,7 +165,7 @@ def save_order_action():
         items_ordered = ", ".join(selected_items)
 
         with open(filename, "a") as f:
-            f.write(f"Date Ordered: {order_date} {order_time} | Follow-Up By: {follow_up_date} | Customer: {name_entry} | Items: {items_ordered} | Qty: {qty} | Receipt Number: {receipt_number}\n")
+            f.write(f"Date Ordered: {order_date} {order_time} | Follow-Up By: {follow_up_date} | Customer: {name_entry} | Items: {items_ordered} | quantity: {quantity} | Receipt Number: {receipt_number}\n")
         
         messagebox.showinfo("Success", f"Order saved successfully!\nFollow-up by: {follow_up_date}")
         main_menu_build()  # Route user back to home panel on success
@@ -252,7 +252,7 @@ def search_order_return():
     with open(filename, "r") as f:
         lines = [line.rstrip("\n") for line in f if line.strip()]
 
-    for idx, line in enumerate(lines):
+    for index, line in enumerate(lines):
         line_lower = line.lower()
         matched = False
         if receipt_number and receipt_number.lower() in line_lower:
@@ -263,8 +263,8 @@ def search_order_return():
             matched = True
 
         if matched:
-            search_matches.append((idx, line))
-            display_text = f"{idx}: {line}"
+            search_matches.append((index, line))
+            display_text = f"{index}: {line}"
             orders_listbox.insert(tk.END, display_text)
 
     if not search_matches:
@@ -285,17 +285,17 @@ def load_order_items():
         messagebox.showerror("Error", "Please select an order from the list first.")
         return
 
-    sel_idx = sel[0]
+    sel_index = sel[0]
     try:
-        loaded_order_index, loaded_order_text = search_matches[sel_idx]
+        loaded_order_index, loaded_order_text = search_matches[sel_index]
     except Exception:
         messagebox.showerror("Error", "Selected order could not be located.")
         return
 
     # Parse items from the order line
-    parts = [p.strip() for p in loaded_order_text.split("|")]
+    parts_of_order = [p.strip() for p in loaded_order_text.split("|")]
     items_field = None
-    for p in parts:
+    for p in parts_of_order:
         if p.lower().startswith("items:"):
             items_field = p
             break
@@ -342,23 +342,23 @@ def return_selected_items():
             messagebox.showerror("Error", "The order could not be found in the file anymore.")
             return
 
-        orig_line = lines[loaded_order_index]
-        parts = [p.strip() for p in orig_line.split("|")]
+        original_line = lines[loaded_order_index]
+        parts_of_order = [p.strip() for p in original_line.split("|")]
 
-        # extract items and qty
-        items_field_idx = None
-        qty_field_idx = None
-        for i, p in enumerate(parts):
+        # extract items and quantity
+        items_field_index = None
+        quantity_field_index = None
+        for i, p in enumerate(parts_of_order):
             if p.lower().startswith("items:"):
-                items_field_idx = i
-            if p.lower().startswith("qty:"):
-                qty_field_idx = i
+                items_field_index = i
+            if p.lower().startswith("quantity:"):
+                quantity_field_index = i
 
-        if items_field_idx is None:
+        if items_field_index is None:
             messagebox.showerror("Error", "Could not parse items from the order.")
             return
 
-        items_text = parts[items_field_idx].split(":", 1)[1].strip()
+        items_text = parts_of_order[items_field_index].split(":", 1)[1].strip()
         current_items = [it.strip() for it in items_text.split(",") if it.strip()]
 
         # Remove selected items
@@ -372,17 +372,17 @@ def return_selected_items():
                     f.write("\n".join(lines) + "\n")
             messagebox.showinfo("Returned", "All selected items returned and order removed.")
         else:
-            # update items field and adjust qty (best-effort)
-            parts[items_field_idx] = f"Items: {', '.join(remaining_items)}"
-            if qty_field_idx is not None:
+            # update items field and adjust quantity (best-effort)
+            parts_of_order[items_field_index] = f"Items: {', '.join(remaining_items)}"
+            if quantity_field_index is not None:
                 try:
-                    orig_qty = int(parts[qty_field_idx].split(":", 1)[1].strip())
-                    new_qty = max(1, orig_qty - len(selected))
-                    parts[qty_field_idx] = f"Qty: {new_qty}"
+                    original_quantity = int(parts_of_order[quantity_field_index].split(":", 1)[1].strip())
+                    new_quantity = max(1, original_quantity - len(selected))
+                    parts_of_order[quantity_field_index] = f"quantity: {new_quantity}"
                 except Exception:
                     pass
 
-            new_line = " | ".join(parts)
+            new_line = " | ".join(parts_of_order)
             lines[loaded_order_index] = new_line
             with open(filename, "w") as f:
                 f.write("\n".join(lines) + "\n")
@@ -402,7 +402,7 @@ def return_selected_items():
 
 # Frame 1: Home Screen Layout Setup
 main_menu_frame = tk.Frame(root, bg="#aeb0b1", borderwidth=10, relief="ridge")
-tk.Label(main_menu_frame, text="Welcome to Byte & Bolt!", font=("Garamond", 18, "bold"), bg="#bdbdbd").pack(pady=20)
+tk.Label(main_menu_frame, text="Welcome to Byte & Bolt!", font = title_spam_size_18, bg="#bdbdbd").pack(pady=20)
 
 tk.Button(main_menu_frame, text="New Order Page", bg="#635dff", fg="white", command=new_order_menu_build, width=25).pack(pady=5)
 tk.Button(main_menu_frame, text="Show Existing Orders", bg="#635dff", fg="white", command=show_order_action, width=25).pack(pady=5)
@@ -441,8 +441,8 @@ year_combo_box = ttk.Combobox(new_order_menu_frame, values=year_values, width=6)
 year_combo_box.set(str(torder_dateay.year))
 year_combo_box.pack(pady=1)
 
-follow_up_var = tk.StringVar(value=(torder_dateay + timedelta(days=7)).strftime("%d-%m-%Y"))
-tk.Label(new_order_menu_frame, textvariable=follow_up_var, bg="#9aa0a7").pack(pady=2)
+follow_up_date = tk.StringVar(value=(torder_dateay + timedelta(days=7)).strftime("%d-%m-%Y"))
+tk.Label(new_order_menu_frame, textvariable=follow_up_date, bg="#9aa0a7").pack(pady=2)
 
 def _update_follow_up(event=None):
     try:
@@ -450,9 +450,9 @@ def _update_follow_up(event=None):
         m = int(month_combo_box.get())
         y = int(year_combo_box.get())
         order_date = date(year=y, month=m, day=d)
-        follow_up_var.set((order_date + timedelta(days=7)).strftime("%d-%m-%Y"))
+        follow_up_date.set((order_date + timedelta(days=7)).strftime("%d-%m-%Y"))
     except Exception:
-        follow_up_var.set("Invalid date")
+        follow_up_date.set("Invalid date")
 
 for cb in (day_combo_box, month_combo_box, year_combo_box):
     cb.bind("<<ComboboxSelected>>", _update_follow_up)

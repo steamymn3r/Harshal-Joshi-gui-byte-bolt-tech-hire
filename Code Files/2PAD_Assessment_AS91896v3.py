@@ -86,7 +86,7 @@ def process_item_data(index):
 def save_order_action():
     """Validates inputs and saves data directly to flat text files."""
     name_entry = str(entry_name.get()).strip()
-    qty = str(entry_quantity.get()).strip()
+    quantity = str(entry_quantity.get()).strip()
     
     if name_entry == "":
         messagebox.showerror("Error", "Please enter your name.")
@@ -96,7 +96,7 @@ def save_order_action():
         messagebox.showerror("Error", "Please select at least one item.")
         return
         
-    if qty == "" or not qty.isdigit() or int(qty) <= 0:
+    if quantity == "" or not quantity.isdigit() or int(quantity) <= 0:
         messagebox.showerror("Error", "Please enter a valid numeric quantity.")
         return
 
@@ -104,7 +104,7 @@ def save_order_action():
         with open(filename, "a") as f:
             timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             items_ordered = ", ".join(selected_items)
-            f.write(f"Date: {timestamp} | Customer: {name_entry} | Items: {items_ordered} | Qty: {qty}\n")
+            f.write(f"Date: {timestamp} | Customer: {name_entry} | Items: {items_ordered} | quantity: {quantity}\n")
         
         messagebox.showinfo("Success", "Order saved successfully!")
         main_menu_build()  # Route user back to home panel on success
@@ -130,7 +130,7 @@ def show_order_action():
 
 # Frame 1: Home Screen Layout Setup
 main_menu_frame = tk.Frame(root, bg="#e8e2c8", borderwidth=10, relief="ridge")
-tk.Label(main_menu_frame, text="Welcome to Byte & Bolt!", font=("Garamond", 18, "bold"), bg="#cbc2a3").pack(pady=20)
+tk.Label(main_menu_frame, text="Welcome to Byte & Bolt!", font = title_spam_size_18, bg="#cbc2a3").pack(pady=20)
 
 tk.Button(main_menu_frame, text="New Order Page", bg="#635dff", fg="white", command=new_order_menu_build, width=25).pack(pady=5)
 tk.Button(main_menu_frame, text="Show Existing Orders", bg="#635dff", fg="white", command=show_order_action, width=25).pack(pady=5)

@@ -96,7 +96,7 @@ def save_order_action():
         return
 
     name_entry = str(entry_name_new_order.get()).strip()
-    qty = str(entry_quantity.get()).strip()
+    quantity = str(entry_quantity.get()).strip()
     receipt_number = str(generate_receipt_number()).strip()
     
     if name_entry == "":
@@ -107,17 +107,17 @@ def save_order_action():
         messagebox.showerror("Error", "Please select at least one item.")
         return
         
-    if qty == "" or not qty.isdigit():
+    if quantity == "" or not quantity.isdigit():
         messagebox.showerror("Error", "Please enter a valid numeric quantity.")
         return
-    if int(qty) < 1 or int(qty) > 20:
+    if int(quantity) < 1 or int(quantity) > 20:
         messagebox.showerror("Error", "Please enter a quantity between 1 and 20.")
         return
     try:
         with open(filename, "a") as f:
             timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             items_ordered = ", ".join(selected_items)
-            f.write(f"Date: {timestamp} | Customer: {name_entry} | Items: {items_ordered} | Qty: {qty} | Receipt Number: {receipt_number}\n")
+            f.write(f"Date: {timestamp} | Customer: {name_entry} | Items: {items_ordered} | quantity: {quantity} | Receipt Number: {receipt_number}\n")
         
         messagebox.showinfo("Success", "Order saved successfully!")
         main_menu_build()  # Route user back to home panel on success
