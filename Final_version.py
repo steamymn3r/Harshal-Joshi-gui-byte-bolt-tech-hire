@@ -92,6 +92,56 @@ def return_order_menu_build():
 
 ## Functions that are essential to the program.
 
+def get_order_datetime():
+    if day_combo_box and month_combo_box and year_combo_box:
+        try:
+            d = int(day_combo_box.get())
+            m = int(month_combo_box.get())
+            y = int(year_combo_box.get())
+            return datetime(year=y, month=m, day=d)
+        except Exception as exc:
+            raise ValueError("Please select a valid order date.") from exc
+    return datetime.now()
+
+
+def get_cart_totals():
+    total_price = 0
+    total_items = 0
+
+    for item_name in shopping_cart:
+        qty = shopping_cart[item_name]
+        price = next((item[1] for item in item_list if item[0] == item_name), 0)
+        item_total = qty * price
+        total_price += item_total
+        total_items += qty
+
+    return total_price, total_items
+
+
+def read_order_lines():
+    if not os.path.exists(filename) or os.path.getsize(filename) == 0:
+        return []
+
+    with open(filename, "r") as f:
+        return [line.rstrip("\n") for line in f if line.strip()]
+
+
+def get_matching_order_entries(name_entry="", receipt_number=""):
+    lines = read_order_lines()
+    matches = []
+
+    for idx, line in enumerate(lines):
+        line_lower = line.lower()
+        if receipt_number and receipt_number.lower() in line_lower:
+            matches.append((idx, line))
+        elif name_entry and f"customer: {name_entry}".lower() in line_lower:
+            matches.append((idx, line))
+        elif not receipt_number and not name_entry:
+            matches.append((idx, line))
+
+    return matches
+
+
 # Adds item to the new order cart
 def add_item_to_cart(item_name, item_price):
     # Add item in goorder_date quantity
@@ -138,29 +188,26 @@ def update_cart_display():
         tk.Label(cart_display_frame, text="Cart is empty", bg="white", fg="gray").pack(pady=20)
         cart_total_var.set("Total: $0.00")
         return
-    
-    total_price = 0
-    total_items = 0
-    
+
+    total_price, total_items = get_cart_totals()
+
     # Display each item in cart through a for loop
     for item_name in shopping_cart:
         qty = shopping_cart[item_name]
         price = next((item[1] for item in item_list if item[0] == item_name), 0)
         item_total = qty * price
-        total_price += item_total
-        total_items += qty
-        
+
         item_row = tk.Frame(cart_display_frame, bg="white", relief="solid", bd=1)
         item_row.pack(fill="x", padx=5, pady=2)
-        
+
         # Item info
         item_info = f"{item_name} x{qty} = ${item_total}"
         tk.Label(item_row, text=item_info, bg="white", anchor="w", justify="left").pack(side="left", fill="x", expand=True, padx=5, pady=5)
-        
+
         # Remove button
-        tk.Button(item_row, text="Remove", bg="#e81313", fg="white", width=8, 
+        tk.Button(item_row, text="Remove", bg="#e81313", fg="white", width=8,
                  command=lambda name=item_name: remove_item_from_cart(name)).pack(side="right", padx=5, pady=2)
-    
+
     cart_total_var.set(f"Total ({total_items} items): ${total_price:.2f}")
 
 # Rewrites the savefile to add a new order.
@@ -172,48 +219,35 @@ def save_order_action():
 
     name_entry = str(entry_name_new_order.get()).strip()
     receipt_number = str(generate_receipt_number()).strip()
-    
+
     if name_entry == "":
         messagebox.showerror("Error", "Please enter your name.")
         return
-    # Name must contain only letters and spaces
     if not re.match(r"^[A-Za-z ]+$", name_entry):
         messagebox.showerror("Error", "Name must contain only letters and spaces.")
         return
-        
+
     if not shopping_cart:
         messagebox.showerror("Error", "Please add at least one item to cart.")
         return
-    
-    try:
-        # Determine order date from date picker if available
-        try:
-            if day_combo_box and month_combo_box and year_combo_box:
-                d = int(day_combo_box.get())
-                m = int(month_combo_box.get())
-                y = int(year_combo_box.get())
-                order_date = datetime(year=y, month=m, day=d)
-            else:
-                order_date = datetime.now()
-        except Exception:
-            messagebox.showerror("Error", "Please select a valid order date.")
-            return
 
-        order_date = order_date.strftime("%d-%m-%Y")
-        order_time = order_date.strftime("%H:%M:%S")
-        follow_up_date = (order_date.date() + timedelta(days=7)).strftime("%d-%m-%Y")
-        
-        # Format items with quantities
+    try:
+        order_dt = get_order_datetime()
+        order_date_text = order_dt.strftime("%d-%m-%Y")
+        order_time = order_dt.strftime("%H:%M:%S")
+        follow_up_date = (order_dt.date() + timedelta(days=7)).strftime("%d-%m-%Y")
+
         items_ordered = ", ".join([f"{item} x{qty}" for item, qty in shopping_cart.items()])
         total_qty = sum(shopping_cart.values())
 
         with open(filename, "a") as f:
-            f.write(f"Date Ordered: {order_date} {order_time} | Follow-Up By: {follow_up_date} | Customer: {name_entry} | Items: {items_ordered} | Qty: {total_qty} | Receipt Number: {receipt_number}\n")
-        
+            f.write(f"Date Ordered: {order_date_text} {order_time} | Follow-Up By: {follow_up_date} | Customer: {name_entry} | Items: {items_ordered} | Qty: {total_qty} | Receipt Number: {receipt_number}\n")
+
         messagebox.showinfo("Success", f"Order saved successfully!\nFollow-up by: {follow_up_date}")
-        main_menu_build()  # Route user back to home panel on success
+        main_menu_build()
     except Exception as e:
         messagebox.showerror("Error", f"Could not save file: {str(e)}")
+
 
 # Receipt generation function
 def generate_receipt():
@@ -221,37 +255,30 @@ def generate_receipt():
     if not shopping_cart:
         messagebox.showerror("Error", "Cart is empty. Cannot generate receipt.")
         return
-    
+
     name_entry = str(entry_name_new_order.get()).strip()
     if name_entry == "":
         messagebox.showerror("Error", "Please enter customer name first.")
         return
-    
+
     try:
-        if day_combo_box and month_combo_box and year_combo_box:
-            d = int(day_combo_box.get())
-            m = int(month_combo_box.get())
-            y = int(year_combo_box.get())
-            order_date = datetime(year=y, month=m, day=d)
-        else:
-            order_date = datetime.now()
+        order_dt = get_order_datetime()
     except Exception:
         messagebox.showerror("Error", "Invalid order date.")
         return
-    
+
     receipt_number = generate_receipt_number()
-    order_date = order_date.strftime("%d-%m-%Y")
-    order_time = order_date.strftime("%H:%M:%S")
-    follow_up_date = (order_date.date() + timedelta(days=7)).strftime("%d-%m-%Y")
-    
-    # Build receipt text
+    order_date_text = order_dt.strftime("%d-%m-%Y")
+    order_time = order_dt.strftime("%H:%M:%S")
+    follow_up_date = (order_dt.date() + timedelta(days=7)).strftime("%d-%m-%Y")
+
     receipt_text = f"""
 {'='*50}
          BYTE & BOLT TECH HIRE RECEIPT
 {'='*50}
 
 Receipt Number: {receipt_number}
-Date: {order_date}
+Date: {order_date_text}
 Time: {order_time}
 Customer: {name_entry}
 Follow-up by: {follow_up_date}
@@ -260,18 +287,15 @@ Follow-up by: {follow_up_date}
 ITEMS ORDERED:
 {'-'*50}
 """
-    
-    total_price = 0
-    total_items = 0
-    
+
+    total_price, total_items = get_cart_totals()
+
     for item_name in shopping_cart:
         qty = shopping_cart[item_name]
         price = next((item[1] for item in item_list if item[0] == item_name), 0)
         item_total = qty * price
-        total_price += item_total
-        total_items += qty
         receipt_text += f"{item_name}\n  Qty: {qty} x ${price} = ${item_total}\n"
-    
+
     receipt_text += f"""
 {'-'*50}
 Total Items: {total_items}
@@ -281,25 +305,21 @@ Total Amount: ${total_price:.2f}
 Thank you for your business!
 {'='*50}
 """
-    
-    # Show receipt in message box
+
     messagebox.showinfo("Order Receipt", receipt_text)
 
 
 # Shows all orders written into the savefile.
 def show_order_action():
     # Reads transactional customer logs out loud via native OS alerts.
-    if not os.path.exists(filename) or os.path.getsize(filename) == 0:
-        messagebox.showerror("No Data", "No files or records found.")
-        return
-    
-    with open(filename, "r") as f:
-        data = f.read().strip()
+    lines = read_order_lines()
+    data = "\n".join(lines).strip()
 
     if data == "":
-        messagebox.showerror("No Data", "Empty File.")
+        messagebox.showerror("No Data", "No files or records found or empty file.")
     else:
         messagebox.showinfo("Data", data)
+
 
 # Rewrites the savefile to not include returned orders.
 def return_order_action():
@@ -316,26 +336,18 @@ def return_order_action():
         return
 
     try:
-        with open(filename, "r") as f:
-            lines = [line.rstrip("\n") for line in f if line.strip()]
+        lines = read_order_lines()
+        matching_entries = get_matching_order_entries(name_entry, receipt_number)
 
-        matching_lines = []
-        for line in lines:
-            line_lower = line.lower()
-            if receipt_number and receipt_number.lower() in line_lower:
-                matching_lines.append(line)
-            elif name_entry and f"customer: {name_entry}".lower() in line_lower:
-                matching_lines.append(line)
-
-        if not matching_lines:
+        if not matching_entries:
             messagebox.showerror("Error", "No matching order found.")
             return
 
-        if len(matching_lines) > 1:
+        if len(matching_entries) > 1:
             messagebox.showwarning("Multiple Matches", "More than one order matched. Please use the receipt number for an exact result.")
             return
 
-        matched_order = matching_lines[0]
+        matched_order = matching_entries[0][1]
         messagebox.showinfo("Order Found", f"Returning this order:\n{matched_order}")
 
         remaining_lines = [line for line in lines if line != matched_order]
@@ -362,23 +374,12 @@ def search_order_return():
         messagebox.showerror("Error", "No orders found.")
         return
 
-    with open(filename, "r") as f:
-        lines = [line.rstrip("\n") for line in f if line.strip()]
+    matching_entries = get_matching_order_entries(name_entry, receipt_number)
 
-    for idx, line in enumerate(lines):
-        line_lower = line.lower()
-        matched = False
-        if receipt_number and receipt_number.lower() in line_lower:
-            matched = True
-        elif name_entry and f"customer: {name_entry}".lower() in line_lower:
-            matched = True
-        elif (not receipt_number and not name_entry):
-            matched = True
-
-        if matched:
-            search_matches.append((idx, line))
-            display_text = f"{idx}: {line}"
-            orders_listbox.insert(tk.END, display_text)
+    for index, line in matching_entries:
+        search_matches.append((index, line))
+        display_text = f"{index}: {line}"
+        orders_listbox.insert(tk.END, display_text)
 
     if not search_matches:
         messagebox.showinfo("No Matches", "No orders matched your search.")
@@ -565,24 +566,24 @@ date_frame = tk.Frame(new_order_menu_frame, bg="#9aa0a7")
 date_frame.pack(fill="x", padx=5, pady=1)
 tk.Label(date_frame, text="Order Date:", bg="#9aa0a7", width=10).pack(side="left")
 
-torder_dateay = date.torder_dateay()
+today = date.today()
 day_values = [str(i).zfill(2) for i in range(1, 32)]
 month_values = [str(i).zfill(2) for i in range(1, 13)]
-year_values = [str(i) for i in range(torder_dateay.year, torder_dateay.year + 3)]
+year_values = [str(i) for i in range(today.year, today.year + 3)]
 
 day_combo_box = ttk.Combobox(date_frame, values=day_values, width=3)
-day_combo_box.set(str(torder_dateay.day).zfill(2))
+day_combo_box.set(str(today.day).zfill(2))
 day_combo_box.pack(side="left", padx=2)
 
 month_combo_box = ttk.Combobox(date_frame, values=month_values, width=3)
-month_combo_box.set(str(torder_dateay.month).zfill(2))
+month_combo_box.set(str(today.month).zfill(2))
 month_combo_box.pack(side="left", padx=2)
 
 year_combo_box = ttk.Combobox(date_frame, values=year_values, width=4)
-year_combo_box.set(str(torder_dateay.year))
+year_combo_box.set(str(today.year))
 year_combo_box.pack(side="left", padx=2)
 
-follow_up_var = tk.StringVar(value=(torder_dateay + timedelta(days=7)).strftime("%d-%m-%Y"))
+follow_up_var = tk.StringVar(value=(today + timedelta(days=7)).strftime("%d-%m-%Y"))
 tk.Label(date_frame, textvariable=follow_up_var, bg="#9aa0a7", width=12).pack(side="left", padx=5)
 
 def _update_follow_up(event=None):
