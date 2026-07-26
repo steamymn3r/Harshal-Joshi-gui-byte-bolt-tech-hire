@@ -666,7 +666,7 @@ for item_data in item_list:
              command=lambda name=item_name, price=item_price: add_item_to_cart(name, price)).pack(side="left", padx=1)
 
 # Bottom section - Shopping Cart (larger, takes remaining space)
-tk.Label(content_frame, text="Shopping Cart", bg="#9aa0a7", font = font_spam_size_9).pack(fill="x", pady=(5, 0))
+tk.Label(content_frame, text="Shopping Cart", bg="#9aa0a7", font = font_spam_size_9).pack(fill="x", pady=(1, 0))
 cart_container = tk.Frame(content_frame, bd=1, relief="sunken", bg="white")
 cart_container.pack(fill="both", expand=True)
 
@@ -680,7 +680,7 @@ cart_canvas.create_window((0, 0), window=cart_display_frame, anchor="nw")
 cart_canvas.configure(yscrollcommand=cart_scrollbar.set)
 
 cart_canvas.pack(side="left", fill="both", expand=True)
-cart_scrollbar.pack(side="right", fill="y")
+cart_scrollbar.pack(side="right", fill="y", pady=(0,20))
 
 # Cart total label
 cart_total_var = tk.StringVar(value="Total: $0.00")
@@ -689,8 +689,8 @@ tk.Label(new_order_menu_frame, textvariable=cart_total_var, bg="#9aa0a7", font =
 # Execution navigation triggers inside Order panel
 button_frame = tk.Frame(new_order_menu_frame, bg="#9e9e9e")
 button_frame.pack(fill="x", pady=2)
-tk.Button(button_frame, text="View Receipt", bg="#4aa3ff", fg="white", font = font_spam_size_8, command=generate_receipt).pack(side="left", padx=3, expand=True, fill="x")
-tk.Button(button_frame, text="Commit Order", bg="#635dff", fg="white", font = font_spam_size_8, command=save_order_action).pack(side="left", padx=3, expand=True, fill="x")
+tk.Button(button_frame, text="View Receipt", bg="#4aa3ff", fg="white", font = font_spam_size_8, command=generate_receipt).place(side="left", padx=3, expand=True, fill="x")
+tk.Button(button_frame, text="Commit Order", bg="#635dff", fg="white", font = font_spam_size_8, command=save_order_action).place(side="left", padx=3, expand=True, fill="x")
 tk.Button(button_frame, text="Cancel", bg="#e81313", fg="white", font = font_spam_size_8, command=main_menu_build).pack(side="left", padx=3, expand=True, fill="x")
 
 
