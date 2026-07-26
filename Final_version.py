@@ -9,7 +9,6 @@ from tkinter import messagebox
 import random
 import os
 from datetime import date, datetime, timedelta
-from pathlib import Path
 import re
 from PIL import Image, ImageTk
 
