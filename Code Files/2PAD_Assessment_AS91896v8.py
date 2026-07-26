@@ -11,9 +11,10 @@ import os
 from datetime import date, datetime, timedelta
 from pathlib import Path
 import re
-
+from PIL import Image, ImageTk
 
 os.environ["TK_SILENCE_DEPRECATION"] = "1"
+
 
 # Main window setup
 root = tk.Tk()
@@ -512,6 +513,32 @@ def return_selected_items():
 # Frame 1: Home Screen Layout Setup
 main_menu_frame = tk.Frame(root, bg="#aeb0b1", borderwidth=10, relief="ridge")
 tk.Label(main_menu_frame, text="Welcome to Byte & Bolt!", font=("Garamond", 18, "bold"), bg="#bdbdbd").pack(pady=20)
+
+# 1. Open the original image file
+raw_img = Image.open("Images/Logo.png")
+
+# 2. Extract dimensions safely
+orig_width, orig_height = raw_img.size
+
+# 3. Calculate new dimensions (simulating your original .subsample(5, 5))
+new_width = orig_width // 5
+new_height = orig_height // 5
+
+# 4. Create the resized raw Pillow object
+resized_pil_img = raw_img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+
+# 5. CONVERT to Tkinter format (This variable MUST be used in your widget)
+png_image = ImageTk.PhotoImage(resized_pil_img)
+
+# 6. Create the layout frame using standard tkinter (tk)
+image_frame = tk.Frame(root)  # Replace 'root' with your parent window variable name if different
+image_frame.pack()
+
+# 7. Create the display Label using the correct 'png_image' variable
+image_label = tk.Label(image_frame, image=png_image)
+image_label.image = png_image  # Explicitly save reference to prevent garbage collection
+image_label.pack()
+
 
 tk.Button(main_menu_frame, text="New Order Page", bg="#635dff", fg="white", command=new_order_menu_build, width=25).pack(pady=5)
 tk.Button(main_menu_frame, text="Show Existing Orders", bg="#635dff", fg="white", command=show_order_action, width=25).pack(pady=5)
