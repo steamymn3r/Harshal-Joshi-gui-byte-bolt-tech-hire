@@ -215,9 +215,9 @@ def save_order_action():
     except Exception as e:
         messagebox.showerror("Error", f"Could not save file: {str(e)}")
 
-
+# Receipt generation function
 def generate_receipt():
-    """Generate a text receipt for the current cart."""
+    # Creates a receipt for the user to view once order is complete
     if not shopping_cart:
         messagebox.showerror("Error", "Cart is empty. Cannot generate receipt.")
         return
@@ -350,7 +350,7 @@ def return_order_action():
 
 # Searches savefile for return
 def search_order_return():
-    """Populate the orders_listbox with matching orders by name or receipt."""
+    # Searched by either using a name entry or a receipt number entry
     global search_matches
     search_matches.clear()
     orders_listbox.delete(0, tk.END)
@@ -385,9 +385,8 @@ def search_order_return():
 
 
 
-# Loads item orders for the things needed to be returned.
+# Loads item orders for the things needed to be returned in the checkbox which is scrollable.
 def load_order_items():
-    """Load items for the selected order into the item checkbox panel."""
     global item_checkbox_vars, loaded_order_index, loaded_order_text
     item_checkbox_vars.clear()
     for w in order_items_frame.winfo_children():
@@ -433,8 +432,8 @@ def load_order_items():
     messagebox.showinfo("Loaded", f"Loaded {len(items)} item(s) for return.")
 
 
+# Return only a select few items
 def return_selected_items():
-    """Return selected individual items from the loaded order."""
     global loaded_order_index, loaded_order_text
     if loaded_order_index is None or loaded_order_text is None:
         messagebox.showerror("Error", "No order loaded. Please load an order first.")
