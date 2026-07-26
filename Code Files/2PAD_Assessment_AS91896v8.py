@@ -42,9 +42,9 @@ order_date = None
 search_matches = []
 
 # Date picker widgets
-day_cb = None
-month_cb = None
-year_cb = None
+day_combo_box = None
+month_combo_box = None
+year_combo_box = None
 follow_up_var = None
 
 # New tracking for return-by-item feature
@@ -167,14 +167,14 @@ def save_order_action():
         messagebox.showerror("Error", "The new order form is not ready yet.")
         return
 
-    name_a = str(entry_name_new_order.get()).strip()
+    name_entry = str(entry_name_new_order.get()).strip()
     receipt_number = str(generate_receipt_number()).strip()
     
-    if name_a == "":
+    if name_entry == "":
         messagebox.showerror("Error", "Please enter your name.")
         return
     # Name must contain only letters and spaces
-    if not re.match(r"^[A-Za-z ]+$", name_a):
+    if not re.match(r"^[A-Za-z ]+$", name_entry):
         messagebox.showerror("Error", "Name must contain only letters and spaces.")
         return
         
@@ -185,10 +185,10 @@ def save_order_action():
     try:
         # Determine order date from date picker if available
         try:
-            if day_cb and month_cb and year_cb:
-                d = int(day_cb.get())
-                m = int(month_cb.get())
-                y = int(year_cb.get())
+            if day_combo_box and month_combo_box and year_combo_box:
+                d = int(day_combo_box.get())
+                m = int(month_combo_box.get())
+                y = int(year_combo_box.get())
                 od = datetime(year=y, month=m, day=d)
             else:
                 od = datetime.now()
@@ -205,7 +205,7 @@ def save_order_action():
         total_qty = sum(shopping_cart.values())
 
         with open(filename, "a") as f:
-            f.write(f"Date Ordered: {order_date} {order_time} | Follow-Up By: {follow_up_date} | Customer: {name_a} | Items: {items_ordered} | Qty: {total_qty} | Receipt Number: {receipt_number}\n")
+            f.write(f"Date Ordered: {order_date} {order_time} | Follow-Up By: {follow_up_date} | Customer: {name_entry} | Items: {items_ordered} | Qty: {total_qty} | Receipt Number: {receipt_number}\n")
         
         messagebox.showinfo("Success", f"Order saved successfully!\nFollow-up by: {follow_up_date}")
         main_menu_build()  # Route user back to home panel on success
@@ -219,16 +219,16 @@ def generate_receipt():
         messagebox.showerror("Error", "Cart is empty. Cannot generate receipt.")
         return
     
-    name_a = str(entry_name_new_order.get()).strip()
-    if name_a == "":
+    name_entry = str(entry_name_new_order.get()).strip()
+    if name_entry == "":
         messagebox.showerror("Error", "Please enter customer name first.")
         return
     
     try:
-        if day_cb and month_cb and year_cb:
-            d = int(day_cb.get())
-            m = int(month_cb.get())
-            y = int(year_cb.get())
+        if day_combo_box and month_combo_box and year_combo_box:
+            d = int(day_combo_box.get())
+            m = int(month_combo_box.get())
+            y = int(year_combo_box.get())
             od = datetime(year=y, month=m, day=d)
         else:
             od = datetime.now()
@@ -250,7 +250,7 @@ def generate_receipt():
 Receipt Number: {receipt_number}
 Date: {order_date}
 Time: {order_time}
-Customer: {name_a}
+Customer: {name_entry}
 Follow-up by: {follow_up_date}
 
 {'-'*50}
@@ -301,10 +301,10 @@ def show_order_action():
 # Rewrites the savefile to not include returned orders.
 def return_order_action():
     # Finds one matching order by customer name or receipt number and removes that one record.
-    name_a = str(entry_name_return.get()).strip()
+    name_entry = str(entry_name_return.get()).strip()
     receipt_number = str(entry_receipt.get()).strip()
 
-    if name_a == "" and receipt_number == "":
+    if name_entry == "" and receipt_number == "":
         messagebox.showerror("Error", "Please enter a customer name or receipt number.")
         return
 
@@ -321,7 +321,7 @@ def return_order_action():
             line_lower = line.lower()
             if receipt_number and receipt_number.lower() in line_lower:
                 matching_lines.append(line)
-            elif name_a and f"customer: {name_a}".lower() in line_lower:
+            elif name_entry and f"customer: {name_entry}".lower() in line_lower:
                 matching_lines.append(line)
 
         if not matching_lines:
@@ -352,7 +352,7 @@ def search_order_return():
     search_matches.clear()
     orders_listbox.delete(0, tk.END)
 
-    name_a = str(entry_name_return.get()).strip()
+    name_entry = str(entry_name_return.get()).strip()
     receipt_number = str(entry_receipt.get()).strip()
 
     if not os.path.exists(filename) or os.path.getsize(filename) == 0:
@@ -367,9 +367,9 @@ def search_order_return():
         matched = False
         if receipt_number and receipt_number.lower() in line_lower:
             matched = True
-        elif name_a and f"customer: {name_a}".lower() in line_lower:
+        elif name_entry and f"customer: {name_entry}".lower() in line_lower:
             matched = True
-        elif (not receipt_number and not name_a):
+        elif (not receipt_number and not name_entry):
             matched = True
 
         if matched:
@@ -568,32 +568,32 @@ day_values = [str(i).zfill(2) for i in range(1, 32)]
 month_values = [str(i).zfill(2) for i in range(1, 13)]
 year_values = [str(i) for i in range(today.year, today.year + 3)]
 
-day_cb = ttk.Combobox(date_frame, values=day_values, width=3)
-day_cb.set(str(today.day).zfill(2))
-day_cb.pack(side="left", padx=2)
+day_combo_box = ttk.Combobox(date_frame, values=day_values, width=3)
+day_combo_box.set(str(today.day).zfill(2))
+day_combo_box.pack(side="left", padx=2)
 
-month_cb = ttk.Combobox(date_frame, values=month_values, width=3)
-month_cb.set(str(today.month).zfill(2))
-month_cb.pack(side="left", padx=2)
+month_combo_box = ttk.Combobox(date_frame, values=month_values, width=3)
+month_combo_box.set(str(today.month).zfill(2))
+month_combo_box.pack(side="left", padx=2)
 
-year_cb = ttk.Combobox(date_frame, values=year_values, width=4)
-year_cb.set(str(today.year))
-year_cb.pack(side="left", padx=2)
+year_combo_box = ttk.Combobox(date_frame, values=year_values, width=4)
+year_combo_box.set(str(today.year))
+year_combo_box.pack(side="left", padx=2)
 
 follow_up_var = tk.StringVar(value=(today + timedelta(days=7)).strftime("%d-%m-%Y"))
 tk.Label(date_frame, textvariable=follow_up_var, bg="#9aa0a7", width=12).pack(side="left", padx=5)
 
 def _update_follow_up(event=None):
     try:
-        d = int(day_cb.get())
-        m = int(month_cb.get())
-        y = int(year_cb.get())
+        d = int(day_combo_box.get())
+        m = int(month_combo_box.get())
+        y = int(year_combo_box.get())
         od = date(year=y, month=m, day=d)
         follow_up_var.set((od + timedelta(days=7)).strftime("%d-%m-%Y"))
     except Exception:
         follow_up_var.set("Invalid date")
 
-for cb in (day_cb, month_cb, year_cb):
+for cb in (day_combo_box, month_combo_box, year_combo_box):
     cb.bind("<<ComboboxSelected>>", _update_follow_up)
 
 # Random receipt generator

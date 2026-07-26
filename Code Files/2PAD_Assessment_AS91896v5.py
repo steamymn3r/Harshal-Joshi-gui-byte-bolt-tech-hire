@@ -95,11 +95,11 @@ def save_order_action():
         messagebox.showerror("Error", "The new order form is not ready yet.")
         return
 
-    name_a = str(entry_name_new_order.get()).strip()
+    name_entry = str(entry_name_new_order.get()).strip()
     qty = str(entry_quantity.get()).strip()
     receipt_number = str(generate_receipt_number()).strip()
     
-    if name_a == "":
+    if name_entry == "":
         messagebox.showerror("Error", "Please enter your name.")
         return
         
@@ -117,7 +117,7 @@ def save_order_action():
         with open(filename, "a") as f:
             timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             items_ordered = ", ".join(selected_items)
-            f.write(f"Date: {timestamp} | Customer: {name_a} | Items: {items_ordered} | Qty: {qty} | Receipt Number: {receipt_number}\n")
+            f.write(f"Date: {timestamp} | Customer: {name_entry} | Items: {items_ordered} | Qty: {qty} | Receipt Number: {receipt_number}\n")
         
         messagebox.showinfo("Success", "Order saved successfully!")
         main_menu_build()  # Route user back to home panel on success
@@ -141,10 +141,10 @@ def show_order_action():
 
 def return_order_action():
     """Finds one matching order by customer name or receipt number and removes that one record."""
-    name_a = str(entry_name_return.get()).strip()
+    name_entry = str(entry_name_return.get()).strip()
     receipt_number = str(entry_receipt.get()).strip()
 
-    if name_a == "" and receipt_number == "":
+    if name_entry == "" and receipt_number == "":
         messagebox.showerror("Error", "Please enter a customer name or receipt number.")
         return
 
@@ -161,7 +161,7 @@ def return_order_action():
             line_lower = line.lower()
             if receipt_number and receipt_number.lower() in line_lower:
                 matching_lines.append(line)
-            elif name_a and f"customer: {name_a}".lower() in line_lower:
+            elif name_entry and f"customer: {name_entry}".lower() in line_lower:
                 matching_lines.append(line)
 
         if not matching_lines:

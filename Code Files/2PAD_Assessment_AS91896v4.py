@@ -94,11 +94,11 @@ def process_item_data(index):
 
 def save_order_action():
     """Validates inputs and saves data directly to flat text files."""
-    name_a = str(entry_name.get()).strip()
+    name_entry = str(entry_name.get()).strip()
     qty = str(entry_quantity.get()).strip()
     receipt_number = str(generate_receipt_number()).strip()
     
-    if name_a == "":
+    if name_entry == "":
         messagebox.showerror("Error", "Please enter your name.")
         return
         
@@ -114,7 +114,7 @@ def save_order_action():
         with open(filename, "a") as f:
             timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             items_ordered = ", ".join(selected_items)
-            f.write(f"Date: {timestamp} | Customer: {name_a} | Items: {items_ordered} | Qty: {qty} | Receipt Number: {receipt_number}\n")
+            f.write(f"Date: {timestamp} | Customer: {name_entry} | Items: {items_ordered} | Qty: {qty} | Receipt Number: {receipt_number}\n")
         
         messagebox.showinfo("Success", "Order saved successfully!")
         main_menu_build()  # Route user back to home panel on success
@@ -139,7 +139,7 @@ def show_order_action():
 def return_order_action():
     # Return process - involves deleting a record from the savefile based on receipt number and/or name - needs to be integrated with search order
     global entry_name, generated_receipt_number
-    name_a = str(entry_name.get()).strip()
+    name_entry = str(entry_name.get()).strip()
     receipt_number = str(generate_receipt_number()).strip()
 
     try:
