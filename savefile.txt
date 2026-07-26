@@ -1,2 +1,2 @@
-Date Ordered: 29-03-2026 00:00:00 | Follow-Up By: 05-04-2026 | Customer: harshal | Items: ACC 1 Keyboard x1, ACC 1 Mouse x20 | quantity: 21 | Receipt Number: R3461
-Date Ordered: 26-07-2026 00:00:00 | Follow-Up By: 02-08-2026 | Customer: Harshal | Items: ACC 1 Mouse x3 | quantity: 3 | Receipt Number: R7620
+Date Ordered: 27-07-2026 00:00:00 | Follow-Up By: 03-08-2026 | Customer: harshal | Items: ACC 1 Keyboard x1 | quantity: 1 | Receipt Number: R3058
+Date Ordered: 27-07-2026 00:00:00 | Follow-Up By: 03-08-2026 | Customer: harshal | Items: ACC 1 Keyboard x1 | quantity: 1 | Receipt Number: R4779

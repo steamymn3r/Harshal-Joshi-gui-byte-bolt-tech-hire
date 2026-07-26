@@ -90,8 +90,30 @@ def new_order_menu_build():
     update_cart_display()
 
 # Return order frame - frame where anti ordering happens
-def return_order_menu_build():
+def return_order_menu_build(order_items_container):
     # Switches window via buttons on the main menu
+
+    global shopping_cart
+    shopping_cart.clear()
+    orders_listbox.delete(0, tk.END)
+
+    if not order_items_container.winfo_exists():
+        return
+
+    order_items_container_child = list(order_items_container.winfo_children())
+    for widget in order_items_container_child:
+        try:
+            if widget.winfo_exists():
+                widget.destroy()
+        except tk.TclError:
+            pass
+
+        
+    if entry_name_return or entry_receipt is not None:
+        entry_name_return.delete(0, tk.END)
+        entry_receipt.delete(0,tk.END)
+
+
     main_menu_frame.pack_forget()
     new_order_menu_frame.pack_forget()
     return_order_menu_frame.pack(padx=20, pady=20, fill="both", expand=True)
