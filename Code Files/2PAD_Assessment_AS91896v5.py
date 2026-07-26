@@ -12,7 +12,7 @@ from PIL import Image, ImageTk
 # Main window setup
 root = tk.Tk()
 root.title("Byte & Bolt Tech Hire")
-root.geometry("500x600")  # Slightly taller to accommodate the single-window layout
+root.geometry("500x600")  # Slightly taller to accommorder_dateate the single-window layout
 
 # Persistent storage configurations
 filename = "savefile.txt"
@@ -39,7 +39,7 @@ def main_menu_build():
     main_menu_frame.pack(padx=20, pady=20, fill="both", expand=True)
 
 def new_order_menu_build():
-    # Switches the window space over to the order construction module.
+    # Switches the window space over to the order construction morder_dateule.
     # Reset tracking arrays for a clean user entry state
     global checkbox_vars, selected_items
     checkbox_vars.clear()
@@ -71,7 +71,7 @@ def new_order_menu_build():
     new_order_menu_frame.pack(padx=20, pady=20, fill="both", expand=True)
 
 def return_order_menu_build():
-    """Switches the view over to the product tracking return system."""
+    """Switches the view over to the prorder_dateuct tracking return system."""
     main_menu_frame.pack_forget()
     new_order_menu_frame.pack_forget()
     return_order_menu_frame.pack(padx=20, pady=20, fill="both", expand=True)

@@ -31,7 +31,7 @@ item_list = [
     ["ARf 4 Keyboard", 22], ["ARf 4 Mouse", 17], ["Torrential PC", 65], ["TAB1TH 553d Laptop", 35], ["25yR Headset", 22]
 ]
 
-# Declaring variables that will be used throughout the entire code here.
+# Declaring variables that will be used throughout the entire corder_datee here.
 checkbox_vars = []
 selected_items = []
 entry_name_new_order = None
@@ -70,7 +70,7 @@ def main_menu_build():
     main_menu_frame.pack(padx=20, pady=20, fill="both", expand=True)
 
 def new_order_menu_build():
-    # Switches the window space over to the order construction module.
+    # Switches the window space over to the order construction morder_dateule.
     # Reset tracking arrays for a clean user entry state
     global shopping_cart
     shopping_cart.clear()
@@ -83,7 +83,7 @@ def new_order_menu_build():
     update_cart_display()
 
 def return_order_menu_build():
-    """Switches the view over to the product tracking return system."""
+    """Switches the view over to the prorder_dateuct tracking return system."""
     main_menu_frame.pack_forget()
     new_order_menu_frame.pack_forget()
     return_order_menu_frame.pack(padx=20, pady=20, fill="both", expand=True)
@@ -188,16 +188,16 @@ def save_order_action():
                 d = int(day_combo_box.get())
                 m = int(month_combo_box.get())
                 y = int(year_combo_box.get())
-                od = datetime(year=y, month=m, day=d)
+                order_date = datetime(year=y, month=m, day=d)
             else:
-                od = datetime.now()
+                order_date = datetime.now()
         except Exception:
             messagebox.showerror("Error", "Please select a valid order date.")
             return
 
-        order_date = od.strftime("%d-%m-%Y")
-        order_time = od.strftime("%H:%M:%S")
-        follow_up_date = (od.date() + timedelta(days=7)).strftime("%d-%m-%Y")
+        order_date = order_date.strftime("%d-%m-%Y")
+        order_time = order_date.strftime("%H:%M:%S")
+        follow_up_date = (order_date.date() + timedelta(days=7)).strftime("%d-%m-%Y")
         
         # Format items with quantities
         items_ordered = ", ".join([f"{item} x{qty}" for item, qty in shopping_cart.items()])
@@ -228,17 +228,17 @@ def generate_receipt():
             d = int(day_combo_box.get())
             m = int(month_combo_box.get())
             y = int(year_combo_box.get())
-            od = datetime(year=y, month=m, day=d)
+            order_date = datetime(year=y, month=m, day=d)
         else:
-            od = datetime.now()
+            order_date = datetime.now()
     except Exception:
         messagebox.showerror("Error", "Invalid order date.")
         return
     
     receipt_number = generate_receipt_number()
-    order_date = od.strftime("%d-%m-%Y")
-    order_time = od.strftime("%H:%M:%S")
-    follow_up_date = (od.date() + timedelta(days=7)).strftime("%d-%m-%Y")
+    order_date = order_date.strftime("%d-%m-%Y")
+    order_time = order_date.strftime("%H:%M:%S")
+    follow_up_date = (order_date.date() + timedelta(days=7)).strftime("%d-%m-%Y")
     
     # Build receipt text
     receipt_text = f"""
@@ -544,24 +544,24 @@ date_frame = tk.Frame(new_order_menu_frame, bg="#9aa0a7")
 date_frame.pack(fill="x", padx=5, pady=1)
 tk.Label(date_frame, text="Order Date:", bg="#9aa0a7", width=10).pack(side="left")
 
-today = date.today()
+torder_dateay = date.torder_dateay()
 day_values = [str(i).zfill(2) for i in range(1, 32)]
 month_values = [str(i).zfill(2) for i in range(1, 13)]
-year_values = [str(i) for i in range(today.year, today.year + 3)]
+year_values = [str(i) for i in range(torder_dateay.year, torder_dateay.year + 3)]
 
 day_combo_box = ttk.Combobox(date_frame, values=day_values, width=3)
-day_combo_box.set(str(today.day).zfill(2))
+day_combo_box.set(str(torder_dateay.day).zfill(2))
 day_combo_box.pack(side="left", padx=2)
 
 month_combo_box = ttk.Combobox(date_frame, values=month_values, width=3)
-month_combo_box.set(str(today.month).zfill(2))
+month_combo_box.set(str(torder_dateay.month).zfill(2))
 month_combo_box.pack(side="left", padx=2)
 
 year_combo_box = ttk.Combobox(date_frame, values=year_values, width=4)
-year_combo_box.set(str(today.year))
+year_combo_box.set(str(torder_dateay.year))
 year_combo_box.pack(side="left", padx=2)
 
-follow_up_var = tk.StringVar(value=(today + timedelta(days=7)).strftime("%d-%m-%Y"))
+follow_up_var = tk.StringVar(value=(torder_dateay + timedelta(days=7)).strftime("%d-%m-%Y"))
 tk.Label(date_frame, textvariable=follow_up_var, bg="#9aa0a7", width=12).pack(side="left", padx=5)
 
 def _update_follow_up(event=None):
@@ -569,8 +569,8 @@ def _update_follow_up(event=None):
         d = int(day_combo_box.get())
         m = int(month_combo_box.get())
         y = int(year_combo_box.get())
-        od = date(year=y, month=m, day=d)
-        follow_up_var.set((od + timedelta(days=7)).strftime("%d-%m-%Y"))
+        order_date = date(year=y, month=m, day=d)
+        follow_up_var.set((order_date + timedelta(days=7)).strftime("%d-%m-%Y"))
     except Exception:
         follow_up_var.set("Invalid date")
 

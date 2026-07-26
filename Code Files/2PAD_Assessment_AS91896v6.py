@@ -12,7 +12,7 @@ from pathlib import Path
 # Main window setup
 root = tk.Tk()
 root.title("Byte & Bolt Tech Hire")
-root.geometry("500x600")  # Slightly taller to accommodate the single-window layout
+root.geometry("500x600")  # Slightly taller to accommorder_dateate the single-window layout
 
 # Persistent storage configurations
 filename = "savefile.txt"
@@ -39,7 +39,7 @@ def main_menu_build():
     main_menu_frame.pack(padx=20, pady=20, fill="both", expand=True)
 
 def new_order_menu_build():
-    # Switches the window space over to the order construction module.
+    # Switches the window space over to the order construction morder_dateule.
     # Reset tracking arrays for a clean user entry state
     global checkbox_vars, selected_items
     checkbox_vars.clear()
@@ -71,7 +71,7 @@ def new_order_menu_build():
     new_order_menu_frame.pack(padx=20, pady=20, fill="both", expand=True)
 
 def return_order_menu_build():
-    """Switches the view over to the product tracking return system."""
+    """Switches the view over to the prorder_dateuct tracking return system."""
     main_menu_frame.pack_forget()
     new_order_menu_frame.pack_forget()
     return_order_menu_frame.pack(padx=20, pady=20, fill="both", expand=True)
@@ -114,9 +114,9 @@ def save_order_action():
         messagebox.showerror("Error", "Please enter a quantity between 1 and 20.")
         return
     try:
-        order_date = date.today().strftime("%d-%m-%Y")
+        order_date = date.torder_dateay().strftime("%d-%m-%Y")
         order_time = datetime.now().strftime("%H:%M:%S")
-        follow_up_date = (date.today() + timedelta(days=7)).strftime("%d-%m-%Y")
+        follow_up_date = (date.torder_dateay() + timedelta(days=7)).strftime("%d-%m-%Y")
         items_ordered = ", ".join(selected_items)
 
         with open(filename, "a") as f:
@@ -228,8 +228,8 @@ tk.Label(new_order_menu_frame, text="Quantity Wanted:", bg="#eddea7").pack()
 entry_quantity = ttk.Combobox(new_order_menu_frame,values=[str(i) for i in range(1, 21)])
 entry_quantity.pack(pady=2)
 
-current_date = date.today().strftime("%d-%m-%Y")
-follow_up_date = (date.today() + timedelta(days=7)).strftime("%d-%m-%Y")
+current_date = date.torder_dateay().strftime("%d-%m-%Y")
+follow_up_date = (date.torder_dateay() + timedelta(days=7)).strftime("%d-%m-%Y")
 tk.Label(new_order_menu_frame, text=f"Order Date: {current_date}", bg="#eddea7").pack(pady=2)
 tk.Label(new_order_menu_frame, text=f"Follow-Up By: {follow_up_date}", bg="#eddea7").pack(pady=2)
 
