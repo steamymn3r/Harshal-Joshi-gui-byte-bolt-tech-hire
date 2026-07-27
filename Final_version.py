@@ -101,7 +101,7 @@ def return_order_menu_build(order_items_container=None):
         orders_listbox.delete(0, tk.END)
 
     # Safely resolve target container from argument or global context
-    container = target_container if target_container is not None else order_items_frame
+    container = order_items_container if order_items_container is not None else order_items_frame
 
     # Safely clear existing children from the container frame
     if container is not None:
