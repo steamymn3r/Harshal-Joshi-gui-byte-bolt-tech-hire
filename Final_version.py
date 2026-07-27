@@ -13,6 +13,8 @@ from PIL import Image, ImageTk
 
 from receipt_utils import get_or_create_receipt_number, reset_receipt_number, set_receipt_number
 
+
+# Below message is for when the program is run on a device that has a lesser version of tkinter.
 os.environ["TK_SILENCE_DEPRECATION"] = "1"
 
 
@@ -61,7 +63,7 @@ cart_total_var = None
 item_spinners = {}  # {item_name: StringVar for quantity}.
 
 
-# Reused variables for fonts 
+# Reused variables for fonts.
 font_spam_size_12 = ("Garamond", 12, "bold")
 font_spam_size_9 = ("Garamond", 9, "bold")
 font_spam_size_8 = ("Garamond", 8)
@@ -72,7 +74,7 @@ title_spam_size_18 = ("Garamond", 18, "bold")
 
 # Main menu frame - central frame to connect all others.
 def main_menu_build():
-     # Starting screen
+     # Starting screen.
     reset_receipt_number()
     new_order_menu_frame.pack_forget()
     return_order_menu_frame.pack_forget()
@@ -291,6 +293,7 @@ def save_order_action():
         items_ordered = ", ".join([f"{item} x{quantity}" for item, quantity in shopping_cart.items()])
         total_quantity = sum(shopping_cart.values())
 
+        # Opens savefile with mode "a" to apppend new order.
         with open(filename, "a") as f:
             f.write(f"Date Ordered: {order_date_text} {order_time} | Follow-Up By: {follow_up_date} | Customer: {name_entry} | Items: {items_ordered} | quantity: {total_quantity} | Receipt Number: {receipt_number}\n")
 
