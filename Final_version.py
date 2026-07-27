@@ -6,11 +6,12 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
-import random
 import os # allows the program to access the native OS.
 from datetime import date, datetime, timedelta
 import re # provides support for regular expressions, allowing manipulation to the string via character specific patterns.
 from PIL import Image, ImageTk
+
+from receipt_utils import get_or_create_receipt_number, reset_receipt_number, set_receipt_number
 
 os.environ["TK_SILENCE_DEPRECATION"] = "1"
 
@@ -72,6 +73,7 @@ title_spam_size_18 = ("Garamond", 18, "bold")
 # Main menu frame - central frame to connect all others.
 def main_menu_build():
      # Starting screen
+    reset_receipt_number()
     new_order_menu_frame.pack_forget()
     return_order_menu_frame.pack_forget()
     main_menu_frame.pack(padx=20, pady=20, fill="both", expand=True)
@@ -81,6 +83,7 @@ def new_order_menu_build():
     # Switches window via buttons on the main menu.
     global shopping_cart
     shopping_cart.clear()
+    reset_receipt_number()
     if entry_name_new_order is not None:
         entry_name_new_order.delete(0, tk.END)
     
@@ -262,7 +265,8 @@ def save_order_action():
         return
 
     name_entry = str(entry_name_new_order.get()).strip()
-    receipt_number = str(generate_receipt_number()).strip()
+    receipt_number = get_or_create_receipt_number()
+    set_receipt_number(receipt_number)
 
     # Checks whether name is correct or not using a regular expression.
     if name_entry == "":
@@ -316,7 +320,7 @@ def generate_receipt():
         messagebox.showerror("Error", "Invalid order date.")
         return
 
-    receipt_number = generate_receipt_number()
+    receipt_number = get_or_create_receipt_number()
     order_date_text = order_dt.strftime("%d-%m-%Y")
     order_time = order_dt.strftime("%H:%M:%S")
     follow_up_date = (order_dt.date() + timedelta(days=7)).strftime("%d-%m-%Y")
@@ -409,6 +413,8 @@ def return_order_action():
     except Exception as e:
         messagebox.showerror("Error", f"Could not process return: {str(e)}")
 
+    # Refresh the return order menu after processing.
+    return_order_menu_build() 
 
 # Searches savefile for return.
 def search_order_return():
@@ -565,6 +571,8 @@ def return_selected_items():
     except Exception as e:
         messagebox.showerror("Error", f"Could not process item returns: {str(e)}")
 
+    # Refresh the return order menu after processing.
+    return_order_menu_build(order_items_frame)  
 
 # Frame 1: Home Screen Layout Setup.
 main_menu_frame = tk.Frame(root, bg="#aeb0b1", borderwidth=10, relief="ridge")
@@ -645,7 +653,7 @@ for cb in (day_combo_box, month_combo_box, year_combo_box):
 
 # Random receipt generator.
 def generate_receipt_number():
-    return f"R{random.randint(0000, 9999)}"
+    return get_or_create_receipt_number()
 
 # Items and cart vertically stacked (cart gets more prominence).
 content_frame = tk.Frame(new_order_menu_frame, bg="#9e9e9e")
