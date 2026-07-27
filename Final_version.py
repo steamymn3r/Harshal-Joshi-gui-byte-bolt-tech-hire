@@ -90,34 +90,45 @@ def new_order_menu_build():
     update_cart_display()
 
 # Return order frame - frame where anti ordering happens
-def return_order_menu_build(order_items_container):
+def return_order_menu_build(order_items_container=None):
     # Switches window via buttons on the main menu
-
     global shopping_cart
     shopping_cart.clear()
-    orders_listbox.delete(0, tk.END)
 
-    if not order_items_container.winfo_exists():
-        return
 
-    order_items_container_child = list(order_items_container.winfo_children())
-    for widget in order_items_container_child:
+    # Clears the listbox where orders are displayed
+    if orders_listbox is not None:
+        orders_listbox.delete(0, tk.END)
+
+    # Safely resolve target container from argument or global context
+    container = target_container if target_container is not None else order_items_frame
+
+    # Safely clear existing children from the container frame
+    if container is not None:
         try:
-            if widget.winfo_exists():
-                widget.destroy()
-        except tk.TclError:
+            if container.winfo_exists():
+                for widget in list(container.winfo_children()):
+                    try:
+                        if widget.winfo_exists():
+                            widget.destroy()
+                    except (tk.TclError, AttributeError):
+                        pass
+        except (tk.TclError, AttributeError):
             pass
 
-        
-    if entry_name_return or entry_receipt is not None:
-        entry_name_return.delete(0, tk.END)
-        entry_receipt.delete(0,tk.END)
 
 
+    # Deletes pre existing arguments within the entry fields
+    if entry_name_return is not None or entry_receipt is not None:
+        if entry_name_return is not None:
+            entry_name_return.delete(0, tk.END)
+        if entry_receipt is not None:
+            entry_receipt.delete(0, tk.END)
+
+    # Other menu interaction that deletes the others, and brings up only return menu.
     main_menu_frame.pack_forget()
     new_order_menu_frame.pack_forget()
     return_order_menu_frame.pack(padx=20, pady=20, fill="both", expand=True)
-
 
 ## Functions that are essential to the program.
 
@@ -671,7 +682,7 @@ cart_container = tk.Frame(content_frame, bd=1, relief="sunken", bg="white")
 cart_container.pack(fill="both", expand=True)
 
 # Scrollable cart canvas
-cart_canvas = tk.Canvas(cart_container, bg="white", highlightthickness=0)
+cart_canvas = tk.Canvas(cart_container, bg="white", highlightthickness=0, height=200)
 cart_scrollbar = tk.Scrollbar(cart_container, orient="vertical", command=cart_canvas.yview)
 cart_display_frame = tk.Frame(cart_canvas, bg="white")
 
@@ -679,7 +690,7 @@ cart_display_frame.bind("<Configure>", lambda e: cart_canvas.configure(scrollreg
 cart_canvas.create_window((0, 0), window=cart_display_frame, anchor="nw")
 cart_canvas.configure(yscrollcommand=cart_scrollbar.set)
 
-cart_canvas.pack(side="left", fill="both", expand=True)
+cart_canvas.pack(side="left", fill="x", expand=True)
 cart_scrollbar.pack(side="right", fill="y", pady=(0,20))
 
 # Cart total label
@@ -689,8 +700,8 @@ tk.Label(new_order_menu_frame, textvariable=cart_total_var, bg="#9aa0a7", font =
 # Execution navigation triggers inside Order panel
 button_frame = tk.Frame(new_order_menu_frame, bg="#9e9e9e")
 button_frame.pack(fill="x", pady=2)
-tk.Button(button_frame, text="View Receipt", bg="#4aa3ff", fg="white", font = font_spam_size_8, command=generate_receipt).place(side="left", padx=3, expand=True, fill="x")
-tk.Button(button_frame, text="Commit Order", bg="#635dff", fg="white", font = font_spam_size_8, command=save_order_action).place(side="left", padx=3, expand=True, fill="x")
+tk.Button(button_frame, text="View Receipt", bg="#4aa3ff", fg="white", font = font_spam_size_8, command=generate_receipt).pack(side="left", padx=3, expand=True, fill="x")
+tk.Button(button_frame, text="Commit Order", bg="#635dff", fg="white", font = font_spam_size_8, command=save_order_action).pack(side="left", padx=3, expand=True, fill="x")
 tk.Button(button_frame, text="Cancel", bg="#e81313", fg="white", font = font_spam_size_8, command=main_menu_build).pack(side="left", padx=3, expand=True, fill="x")
 
 
