@@ -190,6 +190,8 @@ def get_matching_order_entries(name_entry="", receipt_number=""):
 def add_item_to_cart(item_name, item_price):
     global shopping_cart
     quantity_text = item_spinners[item_name].get().strip()
+
+    # Try and except is here to check whether or not quantity is valid (like whather it is withing the capacity of 1 - 20).
     try:
         quantity = int(quantity_text)
         if quantity < 1 or quantity > 20:
@@ -262,6 +264,7 @@ def save_order_action():
     name_entry = str(entry_name_new_order.get()).strip()
     receipt_number = str(generate_receipt_number()).strip()
 
+    # Checks whether name is correct or not using a regular expression.
     if name_entry == "":
         messagebox.showerror("Error", "Please enter your name.")
         return
@@ -269,10 +272,12 @@ def save_order_action():
         messagebox.showerror("Error", "Name must contain only letters and spaces.")
         return
 
+    # Checks whether there is an itme within the cart.
     if not shopping_cart:
         messagebox.showerror("Error", "Please add at least one item to cart.")
         return
 
+    # Checks whether date inputted is valid or not (catches boundary data like 29/02/2026).    
     try:
         order_dt = get_order_datetime()
         order_date_text = order_dt.strftime("%d-%m-%Y")
@@ -298,11 +303,13 @@ def generate_receipt():
         messagebox.showerror("Error", "Cart is empty. Cannot generate receipt.")
         return
 
+    # Checks whether customer name is empty.
     name_entry = str(entry_name_new_order.get()).strip()
     if name_entry == "":
         messagebox.showerror("Error", "Please enter customer name first.")
         return
 
+    # Datetime check.
     try:
         order_dt = get_order_datetime()
     except Exception:
@@ -314,6 +321,7 @@ def generate_receipt():
     order_time = order_dt.strftime("%H:%M:%S")
     follow_up_date = (order_dt.date() + timedelta(days=7)).strftime("%d-%m-%Y")
 
+    # Receipt text is a variable because it would be much easier to print receipt in this format.
     receipt_text = f"""
 {'='*50}
          BYTE & BOLT TECH HIRE RECEIPT
