@@ -529,7 +529,7 @@ def return_selected_items():
                     f.write("\n".join(lines) + "\n")
             messagebox.showinfo("Returned", "All selected items returned and order removed.")
         else:
-            # update items field and adjust quantity (best-effort)
+            # update items field and adjust quantity
             parts_of_order[items_field_index] = f"Items: {', '.join(remaining_items)}"
             if quantity_field_index is not None:
                 try:
@@ -539,6 +539,7 @@ def return_selected_items():
                 except Exception:
                     pass
 
+            # Separates individual parts of the order when listing the order in the listbox.
             new_line = " | ".join(parts_of_order)
             lines[loaded_order_index] = new_line
             with open(filename, "w") as f:
@@ -561,6 +562,8 @@ def return_selected_items():
 main_menu_frame = tk.Frame(root, bg="#aeb0b1", borderwidth=10, relief="ridge")
 tk.Label(main_menu_frame, text="Welcome to Byte & Bolt!", font = title_spam_size_18, bg="#bdbdbd").pack(pady=20)
 
+
+# Image loader
 raw_img = Image.open("Images/Logo.png")
 original_width, original_height = raw_img.size
 new_width = original_width // 5
@@ -573,7 +576,7 @@ image_label = tk.Label(image_frame, image=png_image)
 image_label.image = png_image  # Explicitly save reference to prevent garbage collection
 image_label.pack()
 
-
+# Buttons on the main menu to navigate the GUI
 tk.Button(main_menu_frame, text="New Order Page", bg="#635dff", fg="white", command=new_order_menu_build, width=25).pack(pady=5)
 tk.Button(main_menu_frame, text="Show Existing Orders", bg="#635dff", fg="white", command=show_order_action, width=25).pack(pady=5)
 tk.Button(main_menu_frame, text="Return Order Page", bg="#635dff", fg="white", command=return_order_menu_build, width=25).pack(pady=5)
@@ -597,6 +600,7 @@ date_frame = tk.Frame(new_order_menu_frame, bg="#9aa0a7")
 date_frame.pack(fill="x", padx=5, pady=1)
 tk.Label(date_frame, text="Order Date:", bg="#9aa0a7", width=10).pack(side="left")
 
+# Declaring dates for today.
 today = date.today()
 day_values = [str(i).zfill(2) for i in range(1, 32)]
 month_values = [str(i).zfill(2) for i in range(1, 13)]
